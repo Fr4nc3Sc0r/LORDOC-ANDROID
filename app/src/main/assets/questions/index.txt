@@ -1,0 +1,8 @@
+# Elenco dei file di domande inclusi nel programma (uno per riga).
+# Per aggiungere un file: crealo in questa cartella e aggiungilo qui.
+01_network_fundamentals.txt
+02_network_access.txt
+03_ip_connectivity.txt
+04_ip_services.txt
+05_security_fundamentals.txt
+06_automation_programmability.txt

@@ -1,0 +1,1031 @@
+# =====================================================================
+# Dominio 2.0 - Network Access (20%)
+# =====================================================================
+
+[Q]
+id: NA-001
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. Which issue does the log message indicate?
+exhibit:
+%CDP-4-NATIVE_VLAN_MISMATCH: Native VLAN mismatch discovered on
+GigabitEthernet0/1 (1), with SW2 GigabitEthernet0/1 (99).
+options:
+A) The trunk is not allowed to carry VLAN 99.
+B) The native VLAN configured on the two ends of the trunk is different.
+C) DTP failed to negotiate a trunk.
+D) VTP domain names do not match.
+answer: B
+explanation:
+CDP segnala che la native VLAN locale (1) è diversa da quella del vicino (99). Il traffico untagged inviato su un lato finisce nella VLAN sbagliata sull'altro lato (VLAN leaking), con possibili problemi STP. Soluzione: "switchport trunk native vlan 99" su entrambi i lati.
+reference: Exam topic 2.2 - Configure and verify interswitch connectivity (native VLAN)
+[/Q]
+
+[Q]
+id: NA-002
+domain: 2
+type: SINGLE
+text:
+Two switches are connected. Both interfaces are configured with "switchport mode dynamic auto". What is the resulting operational mode of the link?
+options:
+A) Trunk
+B) Access
+C) The link is err-disabled
+D) Trunk with native VLAN 1 only
+answer: B
+explanation:
+DTP: "dynamic auto" risponde alle richieste di trunk ma non le avvia. Se entrambi i lati sono auto, nessuno inizia la negoziazione → il link resta in access.
+Combinazioni che formano un trunk: desirable+desirable, desirable+auto, trunk+auto, trunk+desirable, trunk+trunk.
+Best practice: configurare i trunk staticamente e disabilitare DTP con "switchport nonegotiate".
+reference: Exam topic 2.2 - Trunk ports / DTP
+[/Q]
+
+[Q]
+id: NA-003
+domain: 2
+type: MULTI
+text:
+Which two statements about IEEE 802.1Q trunking are true?
+options:
+A) It encapsulates the entire original frame in a new header.
+B) It inserts a 4-byte tag into the Ethernet frame.
+C) Frames in the native VLAN are sent untagged by default.
+D) It supports a maximum of 1024 VLANs.
+E) It is a Cisco-proprietary protocol.
+answer: B, C
+explanation:
+802.1Q (standard IEEE) inserisce un tag di 4 byte tra MAC sorgente e EtherType: TPID 0x8100 + PCP (3 bit, priorità CoS) + DEI + VLAN ID a 12 bit (4094 VLAN utilizzabili). Il traffico della native VLAN viaggia senza tag.
+ISL era il protocollo proprietario Cisco che incapsulava l'intero frame.
+reference: Exam topic 2.2.a - Trunk ports (802.1Q)
+[/Q]
+
+[Q]
+id: NA-004
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. All switches run Rapid PVST+ with default settings except for the priorities shown. Which switch becomes the root bridge for VLAN 1?
+exhibit:
+Switch   Bridge priority   MAC address
+SW1      32769             0011.1111.1111
+SW2      24577             0022.2222.2222
+SW3      24577             0033.3333.3333
+SW4      32769             0000.0000.0001
+options:
+A) SW1
+B) SW2
+C) SW3
+D) SW4
+answer: B
+explanation:
+Il root bridge è quello con il Bridge ID più basso. Il BID = priorità (+ VLAN ID con extended system ID) e, a parità, il MAC address più basso.
+SW2 e SW3 hanno la priorità più bassa (24577 = 24576 + VLAN 1). A parità di priorità vince il MAC più basso: 0022.2222.2222 < 0033.3333.3333 → SW2.
+SW4 ha il MAC più basso di tutti ma la priorità viene confrontata prima.
+reference: Exam topic 2.5 - Rapid PVST+ (root bridge election)
+[/Q]
+
+[Q]
+id: NA-005
+domain: 2
+type: SINGLE
+text:
+Which RSTP port role provides an alternate path to the root bridge and becomes the root port if the current root port fails?
+options:
+A) Designated port
+B) Backup port
+C) Alternate port
+D) Disabled port
+answer: C
+explanation:
+Ruoli RSTP:
+- Root port: miglior percorso verso il root (uno per switch non-root)
+- Designated port: porta che inoltra su un segmento
+- Alternate port: percorso alternativo verso il root, ricevuto da un altro switch (bloccata, pronta a subentrare)
+- Backup port: percorso ridondante verso un segmento in cui lo switch è già designated (raro, es. hub)
+Stati RSTP: discarding, learning, forwarding.
+reference: Exam topic 2.5.a - Root port, root bridge, and other port names
+[/Q]
+
+[Q]
+id: NA-006
+domain: 2
+type: SINGLE
+text:
+An access port is configured with "spanning-tree portfast" and "spanning-tree bpduguard enable". What happens if the port receives a BPDU?
+options:
+A) The port transitions to the blocking state and recovers automatically.
+B) The port loses its PortFast status but continues forwarding.
+C) The port is placed in the err-disabled state.
+D) The BPDU is silently dropped.
+answer: C
+explanation:
+BPDU Guard protegge le porte edge: se arriva una BPDU (qualcuno ha collegato uno switch), la porta va in err-disabled. Si ripristina con "shutdown"/"no shutdown" oppure automaticamente con "errdisable recovery cause bpduguard".
+Senza BPDU Guard, una porta PortFast che riceve BPDU perde semplicemente lo stato di edge port, ma continua a funzionare.
+reference: Exam topic 2.5.b - PortFast and its benefits / BPDU Guard
+[/Q]
+
+[Q]
+id: NA-007
+domain: 2
+type: SINGLE
+text:
+Which combination of EtherChannel modes on two connected switches successfully forms a bundle?
+options:
+A) passive / passive
+B) auto / active
+C) active / passive
+D) on / active
+answer: C
+explanation:
+LACP (IEEE 802.3ad): active avvia la negoziazione, passive risponde. Formano un canale: active/active e active/passive. passive/passive no.
+PAgP (Cisco): desirable/desirable e desirable/auto.
+"on" forza il canale senza negoziazione e funziona solo con "on" dall'altra parte. Non si possono mischiare LACP e PAgP (auto/active).
+reference: Exam topic 2.4 - Configure and verify (Layer 2/Layer 3) EtherChannel (LACP)
+[/Q]
+
+[Q]
+id: NA-008
+domain: 2
+type: MULTI
+text:
+Which two parameters must match on all member interfaces for an EtherChannel to form?
+options:
+A) Interface description
+B) Speed and duplex
+C) Port security maximum MAC count
+D) Switchport mode and allowed/native VLANs
+E) Interface MTU on the connected hosts
+answer: B, D
+explanation:
+Le porte membro di un EtherChannel devono avere la stessa configurazione: velocità, duplex, modalità (access/trunk), access VLAN o allowed VLAN e native VLAN. In caso contrario le porte vanno in stato "suspended" (s) nell'output di "show etherchannel summary". La descrizione non conta.
+reference: Exam topic 2.4 - EtherChannel
+[/Q]
+
+[Q]
+id: NA-009
+domain: 2
+type: SINGLE
+text:
+Which statement about LLDP is true?
+options:
+A) It is a Cisco-proprietary protocol enabled by default on all Cisco devices.
+B) It is an IEEE 802.1AB standard protocol and must be enabled globally with "lldp run" on many Cisco IOS devices.
+C) It operates at Layer 3 and requires IP addressing.
+D) It can discover devices that are more than one hop away.
+answer: B
+explanation:
+LLDP (IEEE 802.1AB) è lo standard vendor-neutral di discovery; CDP è proprietario Cisco ed è attivo di default. Entrambi lavorano a Layer 2 e vedono solo i vicini direttamente connessi.
+Comandi: "lldp run" (globale), "lldp transmit" / "lldp receive" (interfaccia), "show lldp neighbors [detail]". Per CDP: "cdp run", "show cdp neighbors detail".
+Timer LLDP di default: 30 s invio, holdtime 120 s. CDP: 60 s / 180 s.
+reference: Exam topic 2.3 - Configure and verify Layer 2 discovery protocols (CDP and LLDP)
+[/Q]
+
+[Q]
+id: NA-010
+domain: 2
+type: SINGLE
+text:
+Which UDP ports does CAPWAP use between a lightweight AP and a WLC?
+options:
+A) 5246 for control and 5247 for data
+B) 5247 for control and 5246 for data
+C) 1812 for control and 1813 for data
+D) 4789 for both control and data
+answer: A
+explanation:
+CAPWAP crea due tunnel tra AP e WLC: control (UDP 5246, cifrato con DTLS) e data (UDP 5247, cifratura DTLS opzionale). 1812/1813 sono RADIUS (autenticazione/accounting), 4789 è VXLAN.
+reference: Exam topic 2.6 - Describe common wireless architectures / CAPWAP
+[/Q]
+
+[Q]
+id: NA-011
+domain: 2
+type: DRAG
+text:
+Match each Cisco lightweight AP mode to its description.
+items:
+Local => Serves clients and tunnels all traffic to the WLC through CAPWAP
+Monitor => Does not serve clients; scans channels for rogue APs and IDS events
+FlexConnect => Can switch client traffic locally at a branch and keep working if the WLC link fails
+Sniffer => Captures 802.11 frames on a channel and forwards them to a packet analyzer
+Bridge => Builds point-to-point or mesh links between APs
+targets: SE-Connect
+explanation:
+Modalità AP da ricordare: Local (default), FlexConnect (filiali, local switching), Monitor (rilevamento), Sniffer (cattura per Wireshark/OmniPeek), Rogue Detector, Bridge/Mesh, SE-Connect (spectrum analysis, analizza interferenze RF anche non Wi-Fi).
+reference: Exam topic 2.7 - Describe physical infrastructure connections of WLAN components / AP modes
+[/Q]
+
+[Q]
+id: NA-012
+domain: 2
+type: SINGLE
+text:
+A WLC is configured with Link Aggregation (LAG) to the distribution switch. How must the switch EtherChannel be configured?
+options:
+A) LACP in active mode
+B) PAgP in desirable mode
+C) Static EtherChannel with "channel-group mode on"
+D) LACP in passive mode
+answer: C
+explanation:
+I WLC Cisco AireOS non supportano LACP né PAgP: il LAG è statico, quindi lo switch va configurato con "channel-group X mode on". Con LAG tutte le porte del WLC si comportano come un'unica interfaccia logica.
+reference: Exam topic 2.7 - WLC ports (LAG)
+[/Q]
+
+[Q]
+id: NA-013
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. Hosts in VLAN 30 on SW1 cannot communicate with hosts in VLAN 30 on SW2. What is the cause?
+exhibit:
+SW1#show interfaces trunk
+Port        Mode         Encapsulation  Status        Native vlan
+Gi0/1       on           802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Gi0/1       1,10,20,40
+
+Port        Vlans allowed and active in management domain
+Gi0/1       1,10,20,40
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi0/1       1,10,20,40
+options:
+A) The trunk is using ISL encapsulation.
+B) VLAN 30 is not allowed on the trunk.
+C) The native VLAN is mismatched.
+D) The trunk is in DTP auto mode.
+answer: B
+explanation:
+L'elenco "Vlans allowed on trunk" non contiene la VLAN 30. Correzione: "switchport trunk allowed vlan add 30".
+Attenzione alla trappola: "switchport trunk allowed vlan 30" (senza "add") sostituisce l'intera lista lasciando passare solo la VLAN 30!
+reference: Exam topic 2.2 - Trunk ports
+[/Q]
+
+[Q]
+id: NA-014
+domain: 2
+type: SINGLE
+text:
+An IP phone and a PC share a single switch port. The PC must be in VLAN 10 and voice traffic in VLAN 20. Which configuration is correct?
+options:
+A) switchport mode trunk / switchport trunk native vlan 20
+B) switchport mode access / switchport access vlan 10 / switchport voice vlan 20
+C) switchport mode access / switchport access vlan 20 / switchport voice vlan 10
+D) switchport mode access / switchport access vlan 10,20
+answer: B
+explanation:
+Con la voice VLAN la porta resta in access: i dati del PC (untagged) vanno nella access VLAN 10; il telefono, informato via CDP/LLDP, tagga il traffico voce con VLAN 20 (e marca CoS 5).
+reference: Exam topic 2.1.b - Access ports (data and voice)
+[/Q]
+
+[Q]
+id: NA-015
+domain: 2
+type: SINGLE
+text:
+Which range identifies the extended VLAN range on Cisco switches?
+options:
+A) 1-1001
+B) 1002-1005
+C) 1006-4094
+D) 4095-8191
+answer: C
+explanation:
+- 0 e 4095: riservate
+- 1: VLAN di default (non cancellabile)
+- 2-1001: normal range
+- 1002-1005: riservate per Token Ring/FDDI (non cancellabili)
+- 1006-4094: extended range (con VTPv1/v2 richiede VTP transparent o off)
+reference: Exam topic 2.1 - Configure and verify VLANs (normal range)
+[/Q]
+
+[Q]
+id: NA-016
+domain: 2
+type: FILL
+text:
+Using the short (16-bit) spanning-tree path cost method, what is the default port cost of a 100 Mbps (FastEthernet) link? (Enter a number.)
+answer: 19
+explanation:
+Costi STP "short" (IEEE 802.1D-1998): 10 Mbps = 100, 100 Mbps = 19, 1 Gbps = 4, 10 Gbps = 2.
+Il root path cost è la somma dei costi delle porte di ingresso lungo il percorso verso il root. Con il metodo "long" (32 bit) i valori sono 2.000.000 / 200.000 / 20.000 / 2.000.
+reference: Exam topic 2.5 - Rapid PVST+ Spanning Tree Protocol
+[/Q]
+
+[Q]
+id: NA-017
+domain: 2
+type: SINGLE
+text:
+Which statement about autonomous APs compared to lightweight APs is true?
+options:
+A) Autonomous APs require a WLC to forward client traffic.
+B) Autonomous APs are configured and managed individually, while lightweight APs are managed centrally by a WLC.
+C) Lightweight APs cannot be powered by PoE.
+D) Lightweight APs operate without CAPWAP.
+answer: B
+explanation:
+Autonomous AP: indipendente, configurato singolarmente (CLI/GUI), adatto a reti piccole. Lightweight AP (split-MAC): le funzioni real-time (beacon, ACK, cifratura) restano sull'AP, quelle di gestione (autenticazione, RF management, roaming, QoS policy) passano al WLC tramite CAPWAP.
+Architetture: autonomous, cloud-based (es. Meraki), split-MAC con WLC on-premises o embedded.
+reference: Exam topic 2.6 - Describe common wireless architectures
+[/Q]
+
+[Q]
+id: NA-018
+domain: 2
+type: SINGLE
+text:
+Which command configures a router subinterface to receive traffic tagged with VLAN 10 in a router-on-a-stick design?
+options:
+A) switchport access vlan 10
+B) encapsulation dot1q 10
+C) vlan 10 native
+D) ip routing vlan 10
+answer: B
+explanation:
+Router-on-a-stick (ROAS):
+interface g0/0.10
+ encapsulation dot1q 10
+ ip address 192.168.10.1 255.255.255.0
+Per la native VLAN si usa "encapsulation dot1q 1 native". La porta dello switch verso il router deve essere un trunk.
+reference: Exam topic 2.1.c - InterVLAN connectivity
+[/Q]
+
+[Q]
+id: NA-019
+domain: 2
+type: SINGLE
+text:
+Which type of WLC interface is used for in-band management and for communication with lightweight APs (CAPWAP)?
+options:
+A) Service port
+B) Management interface
+C) Virtual interface
+D) Dynamic interface
+answer: B
+explanation:
+Interfacce WLC (AireOS):
+- Management: gestione in-band e terminazione dei tunnel CAPWAP.
+- Service port: gestione out-of-band (porta fisica dedicata).
+- Virtual: indirizzo usato per DHCP relay e web authentication (es. 192.0.2.1).
+- Dynamic: mappano le WLAN (SSID) alle VLAN dei client.
+reference: Exam topic 2.8 - Describe network device management access / WLC interfaces
+[/Q]
+
+[Q]
+id: NA-020
+domain: 2
+type: SINGLE
+text:
+Which command displays the MAC addresses learned on a Cisco switch together with their VLAN and port?
+options:
+A) show arp
+B) show mac address-table
+C) show interfaces status
+D) show cdp neighbors
+answer: B
+explanation:
+"show mac address-table [dynamic | address X | interface Y | vlan Z]" mostra la tabella CAM. Le entry dinamiche scadono dopo 300 secondi di inattività (aging time di default), configurabile con "mac address-table aging-time".
+"show arp" mostra invece la tabella IP → MAC del dispositivo.
+reference: Exam topic 1.13 / 2.1 - MAC learning and aging
+[/Q]
+
+# ---------------------------------------------------------------------
+# Espansione banca dati - Network Access
+# ---------------------------------------------------------------------
+
+[Q]
+id: NA-021
+domain: 2
+type: SINGLE
+text:
+An engineer enters "switchport access vlan 50" on an access port, but VLAN 50 does not exist in the VLAN database. What happens?
+options:
+A) The command is rejected.
+B) The port is placed in VLAN 1.
+C) The switch automatically creates VLAN 50 and assigns the port to it.
+D) The port is placed in the err-disabled state.
+answer: C
+explanation:
+Su Cisco IOS lo switch avvisa con "% Access VLAN does not exist. Creating vlan 50" e crea automaticamente la VLAN (con nome di default VLAN0050). È buona prassi però creare e nominare le VLAN esplicitamente: "vlan 50" e "name SALES".
+reference: Exam topic 2.1 - Configure and verify VLANs
+[/Q]
+
+[Q]
+id: NA-022
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. Interface Fa0/5 is connected and up, but it does not appear in the output. What is the most likely reason?
+exhibit:
+SW1#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+10   SALES                            active    Fa0/6, Fa0/7
+20   ENG                              active    Fa0/8
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+options:
+A) Fa0/5 is administratively shut down.
+B) Fa0/5 is operating as a trunk port.
+C) Fa0/5 is assigned to a VLAN that was deleted.
+D) Fa0/5 is in the STP blocking state.
+answer: B
+explanation:
+"show vlan brief" elenca solo le porte in modalità access. Le porte trunk non compaiono: si verificano con "show interfaces trunk". Una porta assegnata a una VLAN cancellata non compare in nessuna VLAN, ma resta inattiva; nel nostro caso la porta è up e funzionante.
+reference: Exam topic 2.1 / 2.2 - VLANs and trunk ports
+[/Q]
+
+[Q]
+id: NA-023
+domain: 2
+type: SINGLE
+text:
+By default, to which VLAN are all ports of a new Cisco switch assigned?
+options:
+A) VLAN 0
+B) VLAN 1
+C) VLAN 99
+D) VLAN 1002
+answer: B
+explanation:
+Tutte le porte sono in VLAN 1 di default, che è anche la native VLAN dei trunk e la VLAN di gestione predefinita. VLAN 1 non può essere cancellata né rinominata. Best practice: spostare le porte inutilizzate in una VLAN "parcheggio" e spegnerle, e usare una VLAN dedicata per la gestione.
+reference: Exam topic 2.1 - Configure and verify VLANs
+[/Q]
+
+[Q]
+id: NA-024
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. Hosts in VLAN 10 and VLAN 20 use the SVIs of the multilayer switch as their default gateways, but they cannot communicate with each other. Both SVIs are up/up. What is missing?
+exhibit:
+interface Vlan10
+ ip address 192.168.10.1 255.255.255.0
+!
+interface Vlan20
+ ip address 192.168.20.1 255.255.255.0
+options:
+A) The "ip routing" global command
+B) The "encapsulation dot1q" command on each SVI
+C) A trunk between the two SVIs
+D) The "no switchport" command on each SVI
+answer: A
+explanation:
+Su uno switch multilayer il routing IPv4 tra SVI richiede il comando globale "ip routing" (su molti modelli è disattivato di default). "no switchport" serve a trasformare una porta fisica in porta routed, non si usa sulle SVI. "encapsulation dot1q" si usa sulle subinterface del router-on-a-stick.
+reference: Exam topic 2.1.c - InterVLAN connectivity
+[/Q]
+
+[Q]
+id: NA-025
+domain: 2
+type: SINGLE
+text:
+The output of "show ip interface brief" displays "Vlan30 is up, line protocol is down". What is a possible cause?
+options:
+A) The SVI has no IP address configured.
+B) No port assigned to VLAN 30 (access or trunk) is up and in the STP forwarding state.
+C) The "ip routing" command is missing.
+D) The SVI is administratively shut down.
+answer: B
+explanation:
+Una SVI va in up/up solo se la VLAN esiste ed è attiva su almeno una porta (access o trunk) up e in forwarding. Se la VLAN non esiste o nessuna porta è attiva, il line protocol resta down. "administratively down" indicherebbe invece un "shutdown" sulla SVI.
+reference: Exam topic 2.1.c - InterVLAN connectivity (SVI)
+[/Q]
+
+[Q]
+id: NA-026
+domain: 2
+type: SINGLE
+text:
+An engineer is configuring a Layer 3 EtherChannel between two multilayer switches. Which command is required on the member interfaces and on the port-channel interface before an IP address can be assigned?
+options:
+A) switchport mode trunk
+B) no switchport
+C) ip routing
+D) channel-protocol lacp
+answer: B
+explanation:
+In un EtherChannel Layer 3 le porte membro e l'interfaccia Port-channel devono essere routed ("no switchport"); l'indirizzo IP si configura sull'interfaccia Port-channel, non sui membri. Esempio:
+interface range g1/0/1 - 2 → no switchport → channel-group 1 mode active
+interface port-channel 1 → ip address 10.0.0.1 255.255.255.252
+reference: Exam topic 2.4 - Configure and verify (Layer 2/Layer 3) EtherChannel
+[/Q]
+
+[Q]
+id: NA-027
+domain: 2
+type: SINGLE
+text:
+How does an EtherChannel decide which member link carries a particular frame?
+options:
+A) Frames are sent round-robin, one frame per link.
+B) A hash of selected fields (such as MAC addresses, IP addresses, or ports) chooses the link for each flow.
+C) All frames use the link with the lowest port number until it is saturated.
+D) The switch measures link utilization in real time and picks the least busy link.
+answer: B
+explanation:
+Il bilanciamento avviene per flusso tramite un algoritmo di hash sui campi scelti con "port-channel load-balance" (es. src-mac, src-dst-ip, src-dst-port). Tutti i frame di uno stesso flusso usano lo stesso link, evitando il riordino; per questo un singolo flusso non può superare la velocità di un link.
+reference: Exam topic 2.4 - EtherChannel
+[/Q]
+
+[Q]
+id: NA-028
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. What is the status of interface Gi0/2?
+exhibit:
+SW1#show etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        S - Layer2      U - in use
+...
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------
+1      Po1(SU)         LACP      Gi0/1(P)    Gi0/2(s)
+options:
+A) It is bundled and forwarding traffic.
+B) It is suspended, likely because its configuration does not match the other members.
+C) It is in stand-alone mode because the neighbor is not running LACP.
+D) It is administratively down.
+answer: B
+explanation:
+Flag: (SU) = Port-channel Layer 2 in uso; (P) = membro attivo nel bundle; (s) = sospeso, tipicamente per incompatibilità di configurazione (velocità, duplex, VLAN, modalità trunk/access); (I) = stand-alone, cioè il vicino non risponde a LACP/PAgP; (D) = down.
+reference: Exam topic 2.4 - EtherChannel verification
+[/Q]
+
+[Q]
+id: NA-029
+domain: 2
+type: MULTI
+text:
+Which two PAgP mode combinations form an EtherChannel?
+options:
+A) auto / auto
+B) desirable / auto
+C) desirable / desirable
+D) auto / on
+E) passive / desirable
+answer: B, C
+explanation:
+PAgP (Cisco): desirable avvia la negoziazione, auto risponde soltanto. Funzionano desirable/desirable e desirable/auto; auto/auto no. "on" non negozia e funziona solo con "on". "passive" è una modalità LACP e non è compatibile con PAgP.
+reference: Exam topic 2.4 - EtherChannel (PAgP)
+[/Q]
+
+[Q]
+id: NA-030
+domain: 2
+type: SINGLE
+text:
+A non-root switch has two ports with the same root path cost toward the root bridge. Which value is compared next to select the root port?
+options:
+A) The lowest local port ID
+B) The lowest sender (neighbor) bridge ID
+C) The highest port speed
+D) The lowest MAC address of the local switch
+answer: B
+explanation:
+Ordine per la scelta della root port:
+1) costo più basso verso il root
+2) Bridge ID più basso del vicino (sender BID)
+3) port priority/ID più basso del vicino (sender port ID)
+4) port ID locale più basso
+La velocità conta solo in quanto determina il costo.
+reference: Exam topic 2.5 - Rapid PVST+ (root port selection)
+[/Q]
+
+[Q]
+id: NA-031
+domain: 2
+type: SINGLE
+text:
+Which command ensures that a switch becomes the root bridge for VLAN 10 by automatically lowering its priority below that of the current root?
+options:
+A) spanning-tree vlan 10 priority 4097
+B) spanning-tree vlan 10 root primary
+C) spanning-tree portfast
+D) spanning-tree vlan 10 cost 1
+answer: B
+explanation:
+"spanning-tree vlan 10 root primary" imposta la priorità a 24576, oppure 4096 in meno della priorità del root attuale se questa è già inferiore. "root secondary" imposta 28672 (root di backup). La priorità configurabile deve essere un multiplo di 4096: 4097 non è valido.
+reference: Exam topic 2.5 - Rapid PVST+ (root bridge)
+[/Q]
+
+[Q]
+id: NA-032
+domain: 2
+type: SINGLE
+text:
+Which value can be configured with the "spanning-tree vlan 1 priority" command?
+options:
+A) 100
+B) 5000
+C) 8192
+D) 32769
+answer: C
+explanation:
+Con l'extended system ID, la priorità configurabile va da 0 a 61440 in multipli di 4096 (0, 4096, 8192, ..., 32768 di default...). Il valore mostrato in "show spanning-tree" (es. 32769) è la priorità configurata + VLAN ID, quindi non si digita.
+reference: Exam topic 2.5 - Rapid PVST+
+[/Q]
+
+[Q]
+id: NA-033
+domain: 2
+type: SINGLE
+text:
+What is the purpose of Root Guard?
+options:
+A) To err-disable a PortFast port that receives any BPDU
+B) To prevent a switch connected to the port from becoming the root bridge by blocking the port if it receives superior BPDUs
+C) To speed up convergence after a root port failure
+D) To prevent unidirectional link failures
+answer: B
+explanation:
+Root Guard si applica sulle porte designated verso switch che non devono mai diventare root (es. switch di accesso o di clienti). Se riceve una BPDU superiore, la porta entra in stato "root-inconsistent" (bloccata) finché le BPDU superiori non smettono di arrivare; poi si ripristina da sola. BPDU Guard invece va in err-disabled per qualsiasi BPDU.
+reference: Exam topic 2.5 - STP optional features
+[/Q]
+
+[Q]
+id: NA-034
+domain: 2
+type: SINGLE
+text:
+In Rapid PVST+, what is a port configured with PortFast called?
+options:
+A) Alternate port
+B) Backup port
+C) Edge port
+D) Point-to-point port
+answer: C
+explanation:
+In RSTP le porte verso gli host (PortFast) sono "edge port": passano subito in forwarding e non generano topology change quando cambiano stato. Le porte full-duplex tra switch sono di tipo "point-to-point" e convergono rapidamente con il meccanismo proposal/agreement.
+reference: Exam topic 2.5.b - PortFast
+[/Q]
+
+[Q]
+id: NA-035
+domain: 2
+type: SINGLE
+text:
+Which RSTP port state corresponds to the 802.1D blocking and listening states?
+options:
+A) Learning
+B) Forwarding
+C) Discarding
+D) Disabled
+answer: C
+explanation:
+RSTP ha solo tre stati: discarding (raccoglie gli stati 802.1D disabled, blocking e listening), learning e forwarding.
+reference: Exam topic 2.5 - Rapid PVST+
+[/Q]
+
+[Q]
+id: NA-036
+domain: 2
+type: FILL
+text:
+With classic 802.1D STP and default timers, what is the maximum time in seconds for a blocking port to begin forwarding after an indirect link failure (max age + listening + learning)? (Enter a number.)
+answer: 50
+explanation:
+Max age 20 s (attesa prima di considerare scadute le BPDU) + forward delay 15 s (listening) + forward delay 15 s (learning) = 50 secondi. RSTP converge in pochi secondi o meno grazie a proposal/agreement e alle alternate port.
+reference: Exam topic 2.5 - STP timers
+[/Q]
+
+[Q]
+id: NA-037
+domain: 2
+type: SINGLE
+text:
+Which statement about Rapid PVST+ is true?
+options:
+A) It runs a single spanning-tree instance for all VLANs.
+B) It runs a separate RSTP instance for each VLAN, allowing a different root bridge per VLAN.
+C) It is an IEEE standard that maps several VLANs to one instance.
+D) It does not support PortFast.
+answer: B
+explanation:
+Rapid PVST+ (default sui Catalyst moderni) esegue un'istanza RSTP per ogni VLAN: si possono scegliere root diversi per VLAN diverse e bilanciare il carico sui link ridondanti. MST (802.1s) invece raggruppa più VLAN in poche istanze.
+reference: Exam topic 2.5 - Rapid PVST+
+[/Q]
+
+[Q]
+id: NA-038
+domain: 2
+type: DRAG
+text:
+Match each 802.1D port state to its behavior.
+items:
+Blocking => Receives BPDUs only; does not forward frames or learn MACs
+Listening => Sends and receives BPDUs; does not learn MAC addresses
+Learning => Learns MAC addresses but does not forward frames
+Forwarding => Forwards frames and learns MAC addresses
+explanation:
+Sequenza 802.1D: blocking → listening (15 s) → learning (15 s) → forwarding. Lo stato disabled corrisponde a una porta spenta. Durante listening e learning la porta non inoltra ancora frame di dati.
+reference: Exam topic 2.5 - STP port states
+[/Q]
+
+[Q]
+id: NA-039
+domain: 2
+type: SINGLE
+text:
+Which information is NOT provided by CDP?
+options:
+A) Device ID (hostname) of the neighbor
+B) Platform and IOS version of the neighbor
+C) Management IP address of the neighbor
+D) OSPF neighbor state of the neighbor
+answer: D
+explanation:
+"show cdp neighbors detail" mostra: device ID, indirizzi IP, piattaforma, capability (router/switch...), interfaccia locale e remota, holdtime, versione software, native VLAN e duplex. Non fornisce informazioni sui protocolli di routing.
+Sicurezza: CDP rivela informazioni utili a un attaccante, quindi va disabilitato sulle porte verso l'esterno.
+reference: Exam topic 2.3 - Layer 2 discovery protocols
+[/Q]
+
+[Q]
+id: NA-040
+domain: 2
+type: SINGLE
+text:
+Which command disables CDP on a single interface while leaving it enabled on the rest of the device?
+options:
+A) no cdp run
+B) no cdp enable
+C) cdp disable
+D) no lldp transmit
+answer: B
+explanation:
+"no cdp enable" disattiva CDP su un'interfaccia; "no cdp run" lo disattiva globalmente. Per LLDP: "no lldp transmit" / "no lldp receive" sull'interfaccia e "no lldp run" a livello globale.
+reference: Exam topic 2.3 - CDP and LLDP
+[/Q]
+
+[Q]
+id: NA-041
+domain: 2
+type: SINGLE
+text:
+Which command displays detailed LLDP information about directly connected neighbors, including their management IP address and capabilities?
+options:
+A) show lldp
+B) show lldp neighbors detail
+C) show cdp neighbors detail
+D) show lldp traffic
+answer: B
+explanation:
+"show lldp neighbors" mostra un riepilogo (device ID, interfaccia locale, holdtime, capability, port ID); "detail" aggiunge indirizzo di gestione, descrizione del sistema e altri TLV. "show lldp" mostra solo lo stato globale e i timer.
+reference: Exam topic 2.3 - LLDP
+[/Q]
+
+[Q]
+id: NA-042
+domain: 2
+type: SINGLE
+text:
+On a Cisco AireOS WLC, which object maps a WLAN (SSID) to a specific wired VLAN?
+options:
+A) Management interface
+B) Service port
+C) Dynamic interface
+D) Virtual interface
+answer: C
+explanation:
+Una dynamic interface (definita da nome, VLAN ID, indirizzo IP, gateway e server DHCP) viene associata alla WLAN: il traffico dei client di quell'SSID esce sulla VLAN corrispondente. Un WLC può avere molte dynamic interface, una per ogni VLAN dei client.
+reference: Exam topic 2.7 - WLC interfaces
+[/Q]
+
+[Q]
+id: NA-043
+domain: 2
+type: SINGLE
+text:
+A lightweight AP operating in local mode is connected to a Catalyst switch. How should the switch port normally be configured?
+options:
+A) As a trunk that allows all client VLANs
+B) As an access port in the AP management VLAN
+C) As a routed port with "no switchport"
+D) As a member of a static EtherChannel
+answer: B
+explanation:
+In local mode tutto il traffico dei client viaggia incapsulato in CAPWAP fino al WLC, quindi all'AP serve solo connettività IP: basta una porta access (eventualmente con PoE). Un AP FlexConnect con local switching necessita invece di un trunk, perché inoltra direttamente il traffico dei client sulle loro VLAN. Il WLC si collega invece con un trunk.
+reference: Exam topic 2.7 - Physical infrastructure connections of WLAN components
+[/Q]
+
+[Q]
+id: NA-044
+domain: 2
+type: SINGLE
+text:
+Which DHCP option can provide lightweight APs with the IP address of the WLC?
+options:
+A) Option 3
+B) Option 6
+C) Option 43
+D) Option 150
+answer: C
+explanation:
+Metodi di discovery del WLC da parte dell'AP: broadcast CAPWAP sulla subnet locale, DHCP option 43 (indirizzi dei WLC), DNS (risoluzione di CISCO-CAPWAP-CONTROLLER.<dominio>), configurazione statica precedente. Option 3 = default gateway, 6 = DNS server, 150 = server TFTP per telefoni IP Cisco.
+reference: Exam topic 2.6 / 2.7 - Wireless architectures
+[/Q]
+
+[Q]
+id: NA-045
+domain: 2
+type: MULTI
+text:
+Which two protocols should be used to manage a WLC securely?
+options:
+A) HTTPS
+B) Telnet
+C) HTTP
+D) SSH
+E) TFTP
+answer: A, D
+explanation:
+Accessi di gestione sicuri: GUI via HTTPS e CLI via SSH (entrambi cifrati). Telnet e HTTP trasmettono le credenziali in chiaro e andrebbero disabilitati. L'autenticazione degli amministratori può essere locale oppure tramite RADIUS/TACACS+.
+reference: Exam topic 2.8 - Describe network device management access (Telnet, SSH, HTTP, HTTPS, console, TACACS+/RADIUS, cloud managed)
+[/Q]
+
+[Q]
+id: NA-046
+domain: 2
+type: FILL
+text:
+What is the default baud rate, in bits per second, for the console port of Cisco IOS devices? (Enter a number.)
+answer: 9600
+explanation:
+Parametri console di default: 9600 baud, 8 bit di dati, nessuna parità, 1 bit di stop, nessun controllo di flusso (9600 8N1). Si collega con il cavo rollover (RJ-45) o USB e un emulatore di terminale (PuTTY, SecureCRT).
+reference: Exam topic 2.8 - Network device management access (console)
+[/Q]
+
+[Q]
+id: NA-047
+domain: 2
+type: SINGLE
+text:
+A Layer 2 switch is managed through interface VLAN 99 (10.99.0.10/24). Administrators in the same subnet can connect with SSH, but administrators in other subnets cannot. What is the most likely cause?
+options:
+A) The "ip routing" command is missing.
+B) The "ip default-gateway" command is missing.
+C) VLAN 99 is not the native VLAN.
+D) The SVI is shut down.
+answer: B
+explanation:
+Uno switch Layer 2 non instrada: per rispondere a host in altre subnet ha bisogno di "ip default-gateway 10.99.0.1". Su uno switch Layer 3 con "ip routing" attivo si usa invece una default route ("ip route 0.0.0.0 0.0.0.0 ...").
+reference: Exam topic 2.8 - Network device management access
+[/Q]
+
+[Q]
+id: NA-048
+domain: 2
+type: SINGLE
+text:
+Which global command causes a switch to tag native VLAN traffic on all 802.1Q trunks?
+options:
+A) switchport trunk native vlan tag
+B) vlan dot1q tag native
+C) encapsulation dot1q native
+D) switchport nonegotiate
+answer: B
+explanation:
+"vlan dot1q tag native" fa sì che anche il traffico della native VLAN venga taggato sui trunk, mitigando gli attacchi VLAN hopping di tipo double tagging. Gli switch che lo usano scartano i frame untagged ricevuti sui trunk.
+reference: Exam topic 2.2 - Native VLAN / 5.7 Layer 2 security
+[/Q]
+
+[Q]
+id: NA-049
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. The engineer wants to keep the link as a trunk but stop the interface from sending DTP frames. Which command should be added?
+exhibit:
+SW1#show interfaces GigabitEthernet0/1 switchport
+Name: Gi0/1
+Switchport: Enabled
+Administrative Mode: trunk
+Operational Mode: trunk
+Administrative Trunking Encapsulation: dot1q
+Negotiation of Trunking: On
+Access Mode VLAN: 1 (default)
+Trunking Native Mode VLAN: 1 (default)
+options:
+A) switchport mode dynamic desirable
+B) switchport nonegotiate
+C) no switchport
+D) switchport trunk allowed vlan none
+answer: B
+explanation:
+"Negotiation of Trunking: On" significa che la porta invia ancora frame DTP. "switchport nonegotiate" disattiva DTP (richiede che la porta sia in mode trunk o access) e la riga diventa "Off". È una best practice di sicurezza: un attaccante non può negoziare un trunk.
+reference: Exam topic 2.2 - Trunk ports / DTP
+[/Q]
+
+[Q]
+id: NA-050
+domain: 2
+type: MULTI
+text:
+Which two benefits do VLANs provide?
+options:
+A) They reduce the size of broadcast domains.
+B) They eliminate the need for routing between departments.
+C) They improve security by segmenting users into separate logical networks.
+D) They increase the number of devices in each collision domain.
+E) They allow broadcasts to reach all devices on the switch.
+answer: A, C
+explanation:
+Le VLAN dividono uno switch in più domini di broadcast logici: meno broadcast per host, migliore sicurezza (la comunicazione tra VLAN passa per un router o un firewall dove si applicano ACL), gestione più flessibile (utenti raggruppati per funzione e non per posizione fisica). Il routing tra VLAN resta necessario.
+reference: Exam topic 2.1 - Configure and verify VLANs
+[/Q]
+
+[Q]
+id: NA-051
+domain: 2
+type: SINGLE
+text:
+Which command quickly lists all switch ports that are in the err-disabled state, together with the reason?
+options:
+A) show interfaces status err-disabled
+B) show spanning-tree blockedports
+C) show ip interface brief
+D) show vlan brief
+answer: A
+explanation:
+"show interfaces status err-disabled" mostra le porte in err-disabled e la causa (psecure-violation, bpduguard, link-flap, ecc.). "show errdisable recovery" mostra se il ripristino automatico è attivo e i relativi timer.
+reference: Exam topic 2.x / 5.7 - Switch port verification
+[/Q]
+
+[Q]
+id: NA-052
+domain: 2
+type: SINGLE
+text:
+On a Cisco WLC, which WLAN QoS profile is intended for voice traffic?
+options:
+A) Bronze
+B) Silver
+C) Gold
+D) Platinum
+answer: D
+explanation:
+Profili QoS dei WLC Cisco: Platinum = voce, Gold = video, Silver = best effort (default), Bronze = background. Il profilo determina la marcatura massima consentita del traffico della WLAN.
+reference: Exam topic 2.9 - Interpret the wireless LAN GUI configuration (QoS profiles)
+[/Q]
+
+[Q]
+id: NA-053
+domain: 2
+type: SINGLE
+text:
+Refer to the exhibit. What does this log message most likely indicate?
+exhibit:
+%SW_MATM-4-MACFLAP_NOTIF: Host 0050.7966.6800 in vlan 10 is flapping
+between port Gi0/1 and port Gi0/2
+options:
+A) A duplex mismatch on Gi0/1
+B) A possible Layer 2 loop, for example because STP is disabled
+C) Port security is shutting down the ports
+D) The host is using DHCP to obtain an address
+answer: B
+explanation:
+Lo stesso MAC appreso alternativamente su due porte indica che i frame stanno girando in un loop di Layer 2 (STP disattivato, hub o cavo collegato tra due porte, misconfigurazione). Altri sintomi: broadcast storm, CPU alta, tabella MAC instabile. In rari casi può essere causato da NIC teaming configurato male sul server.
+reference: Exam topic 2.5 - Spanning Tree / 1.13 switching concepts
+[/Q]
+
+[Q]
+id: NA-054
+domain: 2
+type: SINGLE
+text:
+Which command enters interface configuration mode for ports GigabitEthernet1/0/1 through GigabitEthernet1/0/12 at the same time?
+options:
+A) interface gigabitethernet1/0/1-12
+B) interface range gigabitethernet1/0/1 - 12
+C) interface group gigabitethernet1/0/1 12
+D) interface all gigabitethernet1/0
+answer: B
+explanation:
+"interface range" permette di configurare più porte insieme; si possono indicare più intervalli separati da virgola (es. "interface range g1/0/1 - 12, g1/0/20"). Utile per assegnare la VLAN o attivare PortFast su molte porte di accesso.
+reference: Exam topic 2.1 - Configure and verify VLANs
+[/Q]
+
+[Q]
+id: NA-055
+domain: 2
+type: SINGLE
+text:
+How does a Cisco IP phone learn which voice VLAN to use when connected to a switch port configured with "switchport voice vlan 20"?
+options:
+A) From DHCP option 43
+B) From CDP (or LLDP-MED) messages sent by the switch
+C) From the native VLAN of the trunk
+D) It must be configured manually on each phone
+answer: B
+explanation:
+Lo switch comunica al telefono la voice VLAN tramite CDP (telefoni Cisco) o LLDP-MED (telefoni standard). Il telefono tagga quindi il traffico voce con VLAN 20, mentre il PC collegato dietro di esso invia traffico untagged nella access VLAN.
+reference: Exam topic 2.1.b - Access ports (data and voice) / 2.3 CDP and LLDP
+[/Q]

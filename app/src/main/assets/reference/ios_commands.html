@@ -1,0 +1,50 @@
+<html><body>
+<h1>Comandi IOS essenziali</h1>
+<h2>Modalità</h2>
+<p><code>Router&gt;</code> user EXEC → <code>enable</code> → <code>Router#</code> privileged EXEC →
+<code>configure terminal</code> → <code>Router(config)#</code> → <code>interface g0/0</code> → <code>Router(config-if)#</code></p>
+<h2>Base</h2>
+<pre>
+hostname R1
+enable secret Cisco123!
+no ip domain-lookup
+banner motd # Accesso riservato #
+line console 0
+ password cisco
+ login
+ logging synchronous
+interface g0/0
+ description Link verso SW1
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+copy running-config startup-config
+</pre>
+<h2>Verifica</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Comando</th><th>Cosa mostra</th></tr>
+<tr><td><code>show ip interface brief</code></td><td>stato e IP di tutte le interfacce</td></tr>
+<tr><td><code>show interfaces g0/0</code></td><td>contatori, duplex, velocità, errori</td></tr>
+<tr><td><code>show interfaces status</code></td><td>porte switch: stato, VLAN, duplex, velocità</td></tr>
+<tr><td><code>show ip route</code></td><td>tabella di routing</td></tr>
+<tr><td><code>show vlan brief</code></td><td>VLAN e porte di accesso</td></tr>
+<tr><td><code>show interfaces trunk</code></td><td>trunk, native VLAN, VLAN consentite</td></tr>
+<tr><td><code>show spanning-tree vlan 10</code></td><td>root, ruoli e stati delle porte</td></tr>
+<tr><td><code>show etherchannel summary</code></td><td>port-channel e membri</td></tr>
+<tr><td><code>show mac address-table</code></td><td>tabella MAC</td></tr>
+<tr><td><code>show cdp neighbors detail</code></td><td>vicini, IP, piattaforma, IOS</td></tr>
+<tr><td><code>show ip ospf neighbor</code></td><td>adiacenze OSPF</td></tr>
+<tr><td><code>show standby brief</code></td><td>stato HSRP</td></tr>
+<tr><td><code>show port-security interface f0/1</code></td><td>port security</td></tr>
+<tr><td><code>show access-lists</code></td><td>ACL e contatori di match</td></tr>
+<tr><td><code>show running-config | section ospf</code></td><td>filtra la configurazione</td></tr>
+</table>
+<h2>Stato delle interfacce</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Status / Protocol</th><th>Significato</th></tr>
+<tr><td>up / up</td><td>funzionante</td></tr>
+<tr><td>administratively down / down</td><td>manca <code>no shutdown</code></td></tr>
+<tr><td>down / down</td><td>problema fisico (cavo, porta remota spenta)</td></tr>
+<tr><td>up / down</td><td>problema Layer 2 (incapsulamento, keepalive, clock)</td></tr>
+<tr><td>down / down (err-disabled)</td><td>port security, BPDU guard...</td></tr>
+</table>
+</body></html>

@@ -1,0 +1,48 @@
+<html><body>
+<h1>Automazione e programmabilità</h1>
+<h2>Piani della rete</h2>
+<p><b>Data plane</b>: inoltra il traffico · <b>Control plane</b>: decide (routing, STP, ARP) ·
+<b>Management plane</b>: gestione (SSH, SNMP, API)</p>
+<h2>SDN e controller</h2>
+<ul>
+<li>Northbound API: controller ↔ applicazioni (REST/JSON).</li>
+<li>Southbound API: controller ↔ dispositivi (NETCONF, RESTCONF, OpenFlow, OpFlex, CLI/SSH).</li>
+<li>Underlay = rete fisica e routing IP · Overlay = tunnel logici (VXLAN, LISP) · Fabric = insieme gestito.</li>
+<li>Catalyst Center (ex DNA Center): intent-based networking, automazione, assurance.</li>
+</ul>
+<h2>REST</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>CRUD</th><th>Verbo HTTP</th></tr>
+<tr><td>Create</td><td>POST</td></tr>
+<tr><td>Read</td><td>GET</td></tr>
+<tr><td>Update</td><td>PUT (sostituisce) / PATCH (parziale)</td></tr>
+<tr><td>Delete</td><td>DELETE</td></tr>
+</table>
+<p>Vincoli: client-server, stateless, cacheable, interfaccia uniforme, sistema a livelli.</p>
+<p>Autenticazione: basic, API key, token (bearer), OAuth.</p>
+<p>Codici: 200 OK · 201 Created · 204 No Content · 400 Bad Request · 401 Unauthorized · 403 Forbidden ·
+404 Not Found · 500 Internal Server Error</p>
+<h2>JSON</h2>
+<pre>
+{
+  "hostname": "R1",
+  "vlans": [10, 20, 30],
+  "enabled": true,
+  "location": null,
+  "mgmt": {"ip": "10.0.0.1", "port": 22}
+}
+</pre>
+<p>Oggetto { }, array [ ], stringhe tra <b>doppie</b> virgolette, true/false/null minuscoli, nessuna virgola finale.</p>
+<h2>Strumenti di configuration management</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>Ansible</th><th>Puppet</th><th>Chef</th><th>Terraform</th></tr>
+<tr><td>Agent</td><td>no (SSH)</td><td>sì</td><td>sì</td><td>no (API dei provider)</td></tr>
+<tr><td>Modello</td><td>push</td><td>pull</td><td>pull</td><td>dichiarativo (plan/apply)</td></tr>
+<tr><td>File</td><td>playbook YAML</td><td>manifest</td><td>recipe/cookbook (Ruby)</td><td>HCL</td></tr>
+</table>
+<h2>AI e ML nelle operazioni di rete</h2>
+<ul>
+<li><b>Predittiva / ML</b>: analizza la telemetria, rileva anomalie, prevede guasti e problemi di capacità.</li>
+<li><b>Generativa</b>: produce testo e configurazioni, risponde in linguaggio naturale; l'output va sempre verificato.</li>
+</ul>
+</body></html>

@@ -1,0 +1,43 @@
+<html><body>
+<h1>OSPFv2 single-area</h1>
+<h2>Concetti chiave</h2>
+<ul>
+<li>Link-state, algoritmo SPF (Dijkstra), AD 110, metrica = costo.</li>
+<li>Costo = reference bandwidth (default 100 Mbps) / bandwidth dell'interfaccia.</li>
+<li>Pacchetti: Hello, DBD, LSR, LSU, LSAck. Multicast 224.0.0.5 (tutti i router OSPF) e 224.0.0.6 (DR/BDR).</li>
+<li>Timer di default su broadcast e point-to-point: hello 10 s, dead 40 s.</li>
+</ul>
+<h2>Router ID</h2>
+<ol><li>Comando <code>router-id</code></li><li>IP più alto tra le loopback attive</li><li>IP più alto tra le interfacce fisiche attive</li></ol>
+<h2>Requisiti per l'adiacenza</h2>
+<p>Devono coincidere: area, subnet/maschera, hello/dead, autenticazione, stub flag, MTU (per FULL).
+Il router ID deve essere unico. Il process ID è locale.</p>
+<h2>Stati del vicino</h2>
+<p>Down → Init → 2-Way → ExStart → Exchange → Loading → Full</p>
+<p class="tip">Bloccato in ExStart/Exchange → MTU diversa. 2-Way tra due DROTHER è normale.</p>
+<h2>DR / BDR</h2>
+<ul>
+<li>Eletti su reti broadcast/NBMA; priorità più alta vince (default 1), poi RID più alto.</li>
+<li>Priorità 0 = mai DR/BDR. Elezione non preemptive.</li>
+<li>Su point-to-point (<code>ip ospf network point-to-point</code>) nessuna elezione.</li>
+</ul>
+<h2>LSA principali</h2>
+<p>Type 1 Router · Type 2 Network (generato dal DR) · Type 3 Summary (ABR) · Type 5 External (ASBR)</p>
+<h2>Configurazione</h2>
+<pre>
+router ospf 1
+ router-id 1.1.1.1
+ network 10.0.12.0 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/2
+ auto-cost reference-bandwidth 100000
+ default-information originate
+!
+interface GigabitEthernet0/1
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+ ip ospf cost 10
+ ip ospf priority 100
+</pre>
+<h2>Verifica</h2>
+<p><code>show ip ospf neighbor</code> · <code>show ip ospf interface brief</code> · <code>show ip protocols</code> · <code>show ip route ospf</code> · <code>show ip ospf database</code></p>
+</body></html>

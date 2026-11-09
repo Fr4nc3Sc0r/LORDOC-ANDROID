@@ -1,0 +1,1130 @@
+# =====================================================================
+# Dominio 1.0 - Network Fundamentals (20%)
+# Domande in inglese (come all'esame reale), spiegazioni in italiano.
+# =====================================================================
+
+[Q]
+id: NF-001
+domain: 1
+type: SINGLE
+text:
+At which layer of the OSI model does a switch make forwarding decisions based on MAC addresses?
+options:
+A) Layer 1 - Physical
+B) Layer 2 - Data Link
+C) Layer 3 - Network
+D) Layer 4 - Transport
+answer: B
+explanation:
+Uno switch (Layer 2) costruisce la MAC address table imparando gli indirizzi MAC sorgente dei frame e inoltra in base al MAC di destinazione. I router lavorano a Layer 3 (indirizzi IP), gli hub a Layer 1.
+
+Chicca: uno switch "multilayer" (Layer 3 switch) può anche instradare tra VLAN tramite SVI, ma la commutazione dei frame resta una funzione Layer 2.
+reference: Exam topic 1.1.b - Layer 2 and Layer 3 switches
+[/Q]
+
+[Q]
+id: NF-002
+domain: 1
+type: MULTI
+text:
+Which two statements describe characteristics of UDP?
+options:
+A) It establishes sessions with a three-way handshake.
+B) It is connectionless.
+C) It provides flow control by using windowing.
+D) It has a smaller header than TCP (8 bytes).
+E) It guarantees delivery by retransmitting lost segments.
+answer: B, D
+explanation:
+UDP è connectionless, non numera i segmenti, non ritrasmette e non fa controllo di flusso: per questo l'header è di soli 8 byte (porta sorgente, porta destinazione, lunghezza, checksum). TCP invece ha un header di almeno 20 byte, three-way handshake, sequence/acknowledgment number, windowing e ritrasmissione.
+
+Usi tipici di UDP: DNS (query), DHCP, TFTP, SNMP, Syslog, VoIP/streaming (dove un pacchetto in ritardo è inutile).
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-003
+domain: 1
+type: SINGLE
+text:
+Two older switches that do not support Auto-MDIX must be connected through their copper Ethernet ports. Which cable type is required?
+options:
+A) Straight-through
+B) Crossover
+C) Rollover
+D) Single-mode fiber
+answer: B
+explanation:
+Dispositivi "simili" (switch-switch, router-router, PC-PC, router-PC) richiedono un cavo crossover; dispositivi "diversi" (PC-switch, router-switch) usano il cavo straight-through. Il rollover (cavo console) serve per collegare un PC alla porta console.
+
+Chicca: con Auto-MDIX (oggi quasi universale) l'interfaccia rileva il tipo di cavo e scambia le coppie automaticamente, quindi funziona qualsiasi cavo.
+reference: Exam topic 1.3 - Compare physical interface and cabling types
+[/Q]
+
+[Q]
+id: NF-004
+domain: 1
+type: SINGLE
+text:
+Which IPv4 address belongs to the RFC 1918 private address space?
+options:
+A) 172.32.10.1
+B) 192.169.1.1
+C) 172.20.5.5
+D) 11.0.0.1
+answer: C
+explanation:
+Gli spazi privati RFC 1918 sono:
+- 10.0.0.0/8 (10.0.0.0 - 10.255.255.255)
+- 172.16.0.0/12 (172.16.0.0 - 172.31.255.255)
+- 192.168.0.0/16 (192.168.0.0 - 192.168.255.255)
+172.20.5.5 rientra nel /12. Trappola classica: 172.32.x.x e 192.169.x.x sono indirizzi pubblici.
+reference: Exam topic 1.7 - Describe the need for private IPv4 addressing
+[/Q]
+
+[Q]
+id: NF-005
+domain: 1
+type: SINGLE
+text:
+Which option is the correctly compressed form of the IPv6 address 2001:0DB8:0000:0000:0000:FF00:0042:8329?
+options:
+A) 2001:DB8::FF00:42:8329
+B) 2001:DB8:0:0:FF00::42:8329
+C) 2001:DB8::FF:42:8329
+D) 2001:DB8::FF00::42:8329
+answer: A
+explanation:
+Regole di compressione IPv6:
+1) Gli zeri iniziali di ogni gruppo (hextet) si possono omettere: 0DB8 → DB8, 0042 → 42. Mai gli zeri finali (FF00 resta FF00).
+2) Una sola sequenza contigua di gruppi tutti a zero si sostituisce con "::".
+Usare "::" due volte è ambiguo e non valido; scrivere FF al posto di FF00 rimuove zeri finali, cosa non consentita.
+reference: Exam topic 1.8 - Configure and verify IPv6 addressing and prefix
+[/Q]
+
+[Q]
+id: NF-006
+domain: 1
+type: SINGLE
+text:
+Which prefix is used by IPv6 link-local addresses?
+options:
+A) 2000::/3
+B) FC00::/7
+C) FE80::/10
+D) FF00::/8
+answer: C
+explanation:
+- FE80::/10 → link-local (generati automaticamente su ogni interfaccia IPv6, non instradabili)
+- 2000::/3 → global unicast
+- FC00::/7 → unique local (in pratica FD00::/8), equivalente dei privati IPv4
+- FF00::/8 → multicast
+Chicca: i protocolli di routing IPv6 (OSPFv3, EIGRPv6) usano gli indirizzi link-local come next-hop.
+reference: Exam topic 1.9 - Describe IPv6 address types
+[/Q]
+
+[Q]
+id: NF-007
+domain: 1
+type: SINGLE
+text:
+A router interface with MAC address 0011.2233.4455 is configured with "ipv6 address 2001:DB8:1:1::/64 eui-64". Which interface ID is generated?
+options:
+A) 0011:22FF:FE33:4455
+B) 0211:22FF:FE33:4455
+C) 0211:2233:FFFE:4455
+D) 0011:2233:4455:FFFE
+answer: B
+explanation:
+Procedura EUI-64:
+1) Si divide il MAC a metà: 0011.22 | 33.4455
+2) Si inserisce FFFE nel mezzo: 0011:22FF:FE33:4455
+3) Si inverte il 7° bit (U/L) del primo byte: 00 = 0000 0000 → 0000 0010 = 02
+Risultato: 0211:22FF:FE33:4455 → indirizzo 2001:DB8:1:1:211:22FF:FE33:4455.
+reference: Exam topic 1.9.d - Modified EUI-64
+[/Q]
+
+[Q]
+id: NF-008
+domain: 1
+type: FILL
+text:
+How many usable host addresses are available in a /27 subnet? (Enter a number.)
+answer: 30
+explanation:
+/27 lascia 32 - 27 = 5 bit di host → 2^5 = 32 indirizzi, meno rete e broadcast = 30 host utilizzabili.
+
+Tabella da sapere a memoria: /24=254, /25=126, /26=62, /27=30, /28=14, /29=6, /30=2.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-009
+domain: 1
+type: SINGLE
+text:
+In a collapsed core design, which two layers of the three-tier hierarchical model are combined?
+options:
+A) Access and distribution
+B) Distribution and core
+C) Access and core
+D) Core and WAN edge
+answer: B
+explanation:
+Il modello gerarchico a tre livelli prevede access, distribution e core. Nelle reti piccole/medie (es. un singolo edificio) distribution e core vengono uniti in un unico livello ("collapsed core" o two-tier) per ridurre costi e complessità.
+reference: Exam topic 1.2 - Network topology architectures
+[/Q]
+
+[Q]
+id: NF-010
+domain: 1
+type: SINGLE
+text:
+Which statement about a spine-leaf architecture is true?
+options:
+A) Leaf switches connect to each other in a full mesh.
+B) Every leaf switch connects to every spine switch, and endpoints connect only to leaf switches.
+C) Servers connect directly to spine switches for lower latency.
+D) Spine switches connect to each other to provide redundancy.
+answer: B
+explanation:
+Nella topologia spine-leaf (tipica dei data center) ogni leaf è collegato a ogni spine; i leaf non si collegano tra loro e gli spine non si collegano tra loro. Server, storage e altri endpoint si collegano solo ai leaf. Così ogni percorso tra due server attraversa sempre lo stesso numero di hop (leaf-spine-leaf), con latenza prevedibile e scalabilità orizzontale per traffico east-west.
+reference: Exam topic 1.2.c - Spine-leaf
+[/Q]
+
+[Q]
+id: NF-011
+domain: 1
+type: DRAG
+text:
+Match each OSI layer to the name of the protocol data unit (PDU) used at that layer.
+items:
+Transport layer => Segment
+Network layer => Packet
+Data Link layer => Frame
+Physical layer => Bits
+targets: Message
+explanation:
+Incapsulamento dall'alto verso il basso: Dati (L5-7) → Segment (L4, TCP; per UDP si parla anche di datagram) → Packet (L3) → Frame (L2) → Bits (L1).
+Mnemonico: "Do Some People Fear Birthdays?" (Data, Segment, Packet, Frame, Bits).
+reference: Exam topic 1.1 - Role and function of network components / OSI model
+[/Q]
+
+[Q]
+id: NF-012
+domain: 1
+type: MULTI
+text:
+Which two statements about single-mode fiber (SMF) compared to multimode fiber (MMF) are true?
+options:
+A) SMF has a larger core diameter than MMF.
+B) SMF typically uses laser light sources.
+C) SMF supports longer distances than MMF.
+D) SMF is generally cheaper to deploy because it uses LED transmitters.
+E) SMF suffers from higher modal dispersion.
+answer: B, C
+explanation:
+Single-mode: core sottile (~9 µm), un solo modo di propagazione, sorgente laser, distanze di decine di km, ottiche più costose.
+Multimode: core più grande (50/62,5 µm), sorgenti LED/VCSEL economiche, distanze fino a qualche centinaio di metri a causa della dispersione modale.
+reference: Exam topic 1.3.a - Single-mode fiber, multimode fiber, copper
+[/Q]
+
+[Q]
+id: NF-013
+domain: 1
+type: SINGLE
+text:
+Refer to the exhibit. Users connected to SW1 report slow performance. What is the most likely cause?
+exhibit:
+SW1#show interfaces GigabitEthernet0/1
+GigabitEthernet0/1 is up, line protocol is up (connected)
+  Hardware is Gigabit Ethernet, address is 0c1a.2b3c.4d01
+  Half-duplex, 100Mb/s, media type is 10/100/1000BaseTX
+  ...
+     5 minute input rate 2140000 bits/sec, 410 packets/sec
+     152340 packets input, 98123431 bytes, 0 no buffer
+     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+     98231 packets output, 45120394 bytes, 0 underruns
+     0 output errors, 1784 collisions, 0 interface resets
+     0 babbles, 1529 late collision, 0 deferred
+options:
+A) A duplex mismatch between SW1 and the connected device
+B) An incorrect VLAN assignment
+C) A faulty cable that causes CRC errors
+D) Spanning Tree is blocking the port
+answer: A
+explanation:
+I "late collision" (collisioni dopo i primi 64 byte del frame) su un'interfaccia in half-duplex sono il sintomo classico di duplex mismatch: questo lato è half-duplex, l'altro full-duplex. Il lato full-duplex tipicamente mostra invece errori CRC/runt.
+
+Chicca: se un lato ha l'autonegoziazione disattivata, l'altro lato (in auto) a 10/100 Mbps sceglie half-duplex → mismatch. Soluzione: configurare entrambi i lati allo stesso modo (meglio auto/auto).
+reference: Exam topic 1.4 - Identify interface and cable issues (collisions, errors, mismatch duplex and/or speed)
+[/Q]
+
+[Q]
+id: NF-014
+domain: 1
+type: SINGLE
+text:
+Which set of 2.4 GHz Wi-Fi channels is non-overlapping in North America?
+options:
+A) 1, 5, 9
+B) 1, 6, 11
+C) 2, 7, 12
+D) 1, 7, 13
+answer: B
+explanation:
+Nella banda 2,4 GHz i canali sono distanziati di 5 MHz ma ognuno occupa circa 22 MHz: gli unici tre canali che non si sovrappongono (in Nord America, canali 1-11) sono 1, 6 e 11. La banda 5 GHz offre molti più canali non sovrapposti ed è preferibile per la densità di AP.
+reference: Exam topic 1.11 - Wireless principles (nonoverlapping Wi-Fi channels)
+[/Q]
+
+[Q]
+id: NF-015
+domain: 1
+type: SINGLE
+text:
+Which statement describes a Type 1 hypervisor?
+options:
+A) It runs as an application on top of a host operating system.
+B) It runs directly on the physical server hardware (bare metal).
+C) It shares the host operating system kernel among isolated containers.
+D) It is used only in public cloud environments.
+answer: B
+explanation:
+Type 1 (bare metal): gira direttamente sull'hardware (es. VMware ESXi, Microsoft Hyper-V, KVM). Type 2 (hosted): gira come applicazione sopra un sistema operativo (es. VirtualBox, VMware Workstation).
+I container condividono il kernel dell'host e non usano un hypervisor per ogni istanza.
+reference: Exam topic 1.12 - Explain virtualization fundamentals (server virtualization, containers, and VRFs)
+[/Q]
+
+[Q]
+id: NF-016
+domain: 1
+type: DRAG
+text:
+Match each cloud service model to its description.
+items:
+The provider delivers a complete application that users access through a browser => SaaS
+The provider delivers a development and runtime platform; the customer deploys its own code => PaaS
+The provider delivers virtual machines, storage, and networking; the customer manages the OS => IaaS
+explanation:
+- SaaS (Software as a Service): applicazione completa (es. posta web, CRM online).
+- PaaS (Platform as a Service): piattaforma per sviluppare/eseguire codice senza gestire server e OS.
+- IaaS (Infrastructure as a Service): risorse di calcolo virtuali; il cliente gestisce OS, middleware e applicazioni.
+reference: Exam topic 1.1 - Network components / cloud concepts
+[/Q]
+
+[Q]
+id: NF-017
+domain: 1
+type: SINGLE
+text:
+A switch receives a unicast frame whose destination MAC address is not in its MAC address table. What does the switch do?
+options:
+A) It drops the frame.
+B) It floods the frame out all ports in the same VLAN except the port on which it was received.
+C) It sends an ARP request to discover the destination MAC address.
+D) It forwards the frame only to the default gateway port.
+answer: B
+explanation:
+Unknown unicast flooding: se il MAC di destinazione non è in tabella, lo switch inoltra il frame su tutte le porte della stessa VLAN tranne quella di ingresso. Quando il destinatario risponde, lo switch impara il suo MAC e i frame successivi verranno inoltrati solo sulla porta corretta.
+Lo switch non genera richieste ARP: ARP è un meccanismo degli host per risolvere IP → MAC.
+reference: Exam topic 1.13 - Describe switching concepts (MAC learning, aging, frame flooding)
+[/Q]
+
+[Q]
+id: NF-018
+domain: 1
+type: DRAG
+text:
+Match each IPv6 address to its address type.
+items:
+FE80::1 => Link-local unicast
+FF02::2 => Multicast
+FD12:3456::1 => Unique local
+2001:DB8:ACAD::1 => Global unicast
+::1 => Loopback
+targets: Anycast
+explanation:
+- FE80::/10 link-local
+- FF00::/8 multicast (FF02::1 = tutti i nodi, FF02::2 = tutti i router)
+- FC00::/7 unique local (FD00::/8 nella pratica)
+- 2000::/3 global unicast (2001:DB8::/32 è riservato alla documentazione, ma è comunque nel range global unicast)
+- ::1 loopback (equivalente di 127.0.0.1)
+Gli indirizzi anycast non hanno un prefisso dedicato: sono indirizzi unicast assegnati a più dispositivi.
+reference: Exam topic 1.9 - Describe IPv6 address types
+[/Q]
+
+[Q]
+id: NF-019
+domain: 1
+type: FILL
+text:
+What is the network address of the subnet that host 192.168.10.77/26 belongs to?
+answer: 192.168.10.64 | 192.168.10.64/26
+explanation:
+/26 = 255.255.255.192 → magic number 256 - 192 = 64. Le subnet sono .0, .64, .128, .192. L'host .77 cade nel blocco 64-127 → rete 192.168.10.64, broadcast 192.168.10.127, host .65-.126.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-020
+domain: 1
+type: SINGLE
+text:
+Which PoE standard, also known as PoE+, provides up to 30 W per port at the power sourcing equipment (PSE)?
+options:
+A) IEEE 802.3af
+B) IEEE 802.3at
+C) IEEE 802.3bt
+D) Cisco UPOE
+answer: B
+explanation:
+- 802.3af (PoE): fino a 15,4 W per porta
+- 802.3at (PoE+): fino a 30 W
+- 802.3bt (PoE++ / 4PPoE): fino a 60 W (Type 3) o 90-100 W (Type 4)
+- Cisco UPOE: 60 W (proprietario, precursore del bt)
+reference: Exam topic 1.1.h - PoE
+[/Q]
+
+[Q]
+id: NF-021
+domain: 1
+type: SINGLE
+text:
+Which sequence correctly describes the TCP three-way handshake?
+options:
+A) SYN, ACK, SYN-ACK
+B) SYN, SYN-ACK, ACK
+C) ACK, SYN, SYN-ACK
+D) SYN, SYN, ACK
+answer: B
+explanation:
+Il client invia SYN (con il proprio sequence number iniziale), il server risponde SYN-ACK (riconosce il SYN e invia il proprio ISN), il client conclude con ACK. La chiusura ordinata avviene invece con FIN/ACK in ciascuna direzione (four-way).
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-022
+domain: 1
+type: SINGLE
+text:
+Which Windows command displays the IP address, subnet mask, default gateway, DNS servers, and MAC address of all network adapters?
+options:
+A) ipconfig
+B) ipconfig /all
+C) netstat -r
+D) arp -a
+answer: B
+explanation:
+"ipconfig" mostra solo IP, maschera e gateway; "ipconfig /all" aggiunge MAC (physical address), server DNS, stato DHCP e lease. Su macOS/Linux si usano "ifconfig" o "ip address", e il gateway si vede con "netstat -rn" o "ip route".
+reference: Exam topic 1.10 - Verify IP parameters for Client OS (Windows, Mac OS, Linux)
+[/Q]
+
+[Q]
+id: NF-023
+domain: 1
+type: SINGLE
+text:
+What is the main function of a next-generation firewall (NGFW) compared to a traditional stateful firewall?
+options:
+A) It only filters traffic based on source and destination IP addresses.
+B) It adds application awareness and integrated intrusion prevention to stateful filtering.
+C) It replaces the need for routing protocols at the network edge.
+D) It provides wireless access to clients.
+answer: B
+explanation:
+Un firewall stateful tiene traccia delle sessioni (5-tupla). Un NGFW aggiunge: visibilità e controllo a livello applicativo (AVC), IPS integrato, filtraggio URL, protezione da malware avanzato (AMP) e integrazione con threat intelligence.
+reference: Exam topic 1.1.c - Next-generation firewalls and IPS
+[/Q]
+
+[Q]
+id: NF-024
+domain: 1
+type: SINGLE
+text:
+Which IPv6 address type is assigned to multiple devices, with packets delivered to the nearest one according to the routing metric?
+options:
+A) Multicast
+B) Broadcast
+C) Anycast
+D) Link-local
+answer: C
+explanation:
+Anycast: lo stesso indirizzo unicast è configurato su più nodi; il routing consegna il pacchetto al più vicino. È usato ad esempio dai root server DNS. IPv6 non ha broadcast: le sue funzioni sono svolte dal multicast (es. FF02::1).
+reference: Exam topic 1.9.c - Anycast
+[/Q]
+
+# ---------------------------------------------------------------------
+# Espansione banca dati - Network Fundamentals
+# ---------------------------------------------------------------------
+
+[Q]
+id: NF-025
+domain: 1
+type: SINGLE
+text:
+A router has two LAN interfaces. Each interface connects to a separate Layer 2 switch, and each switch has four PCs attached. No VLANs are configured. How many collision domains and broadcast domains exist?
+options:
+A) 2 collision domains and 2 broadcast domains
+B) 10 collision domains and 2 broadcast domains
+C) 10 collision domains and 1 broadcast domain
+D) 8 collision domains and 2 broadcast domains
+answer: B
+explanation:
+Ogni porta di uno switch è un dominio di collisione separato: per ogni switch ci sono 4 porte verso i PC + 1 porta verso il router = 5, quindi 10 in totale.
+Ogni interfaccia del router delimita un dominio di broadcast: 2 broadcast domain.
+Ricorda: gli hub estendono i domini di collisione, gli switch li separano, i router separano anche i domini di broadcast (come le VLAN).
+reference: Exam topic 1.1 - Role and function of network components
+[/Q]
+
+[Q]
+id: NF-026
+domain: 1
+type: SINGLE
+text:
+Which network component centrally manages the configuration, RF settings, and security policies of lightweight access points?
+options:
+A) Layer 3 switch
+B) Next-generation firewall
+C) Wireless LAN controller
+D) Network management server running Syslog
+answer: C
+explanation:
+Il WLC (Wireless LAN Controller) gestisce centralmente gli AP lightweight via CAPWAP: configurazione delle WLAN, gestione RF (canali e potenza, RRM), autenticazione dei client, roaming e policy di sicurezza.
+reference: Exam topic 1.1.e - Controllers (Cisco Catalyst Center and WLC)
+[/Q]
+
+[Q]
+id: NF-027
+domain: 1
+type: MULTI
+text:
+Which two functions are performed by a router?
+options:
+A) It forwards frames based on destination MAC addresses.
+B) It separates broadcast domains.
+C) It floods unknown unicast frames out all interfaces.
+D) It selects the best path to a destination based on the destination IP address.
+E) It extends a single collision domain across multiple interfaces.
+answer: B, D
+explanation:
+Il router è un dispositivo Layer 3: sceglie il percorso migliore in base all'IP di destinazione (tabella di routing) e non inoltra i broadcast, quindi ogni interfaccia è un dominio di broadcast separato. Inoltro per MAC e flooding sono funzioni degli switch.
+reference: Exam topic 1.1.a - Routers
+[/Q]
+
+[Q]
+id: NF-028
+domain: 1
+type: SINGLE
+text:
+What is the maximum segment length of a Cat 5e or Cat 6 UTP Ethernet link (1000BASE-T)?
+options:
+A) 100 meters
+B) 185 meters
+C) 500 meters
+D) 2 kilometers
+answer: A
+explanation:
+Il rame UTP (10BASE-T, 100BASE-TX, 1000BASE-T) supporta al massimo 100 m per segmento. Per distanze maggiori si usa la fibra: multimode fino a qualche centinaio di metri, single-mode fino a decine di km.
+reference: Exam topic 1.3 - Compare physical interface and cabling types
+[/Q]
+
+[Q]
+id: NF-029
+domain: 1
+type: SINGLE
+text:
+Refer to the exhibit. What is the most likely cause of the errors?
+exhibit:
+SW1#show interfaces GigabitEthernet0/5
+GigabitEthernet0/5 is up, line protocol is up (connected)
+  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX
+  ...
+     2290183 packets input, 1873419023 bytes, 0 no buffer
+     8754 input errors, 8721 CRC, 33 frame, 0 overrun, 0 ignored
+     0 output errors, 0 collisions, 0 interface resets
+     0 late collision, 0 deferred
+options:
+A) The interface is assigned to the wrong VLAN.
+B) A spanning-tree loop exists.
+C) A physical-layer problem such as a damaged cable or electromagnetic interference.
+D) The port security maximum has been reached.
+answer: C
+explanation:
+Molti errori CRC (frame ricevuti con checksum errato) senza collisioni indicano un problema fisico: cavo danneggiato o di categoria insufficiente, connettori difettosi, interferenze elettromagnetiche. Prima verifica da fare: sostituire il cavo o provare un'altra porta.
+Promemoria dei contatori: runts (< 64 byte), giants (> 1518 byte), CRC (checksum errato), late collision (tipico del duplex mismatch).
+reference: Exam topic 1.4 - Identify interface and cable issues
+[/Q]
+
+[Q]
+id: NF-030
+domain: 1
+type: SINGLE
+text:
+Autonegotiation is disabled on both ends of a copper link. One side is manually set to 100 Mbps and the other side to 1000 Mbps. What is the result?
+options:
+A) The link comes up at 100 Mbps.
+B) The link comes up at 1000 Mbps in half duplex.
+C) The link does not come up (the interfaces show down/down).
+D) The link comes up but generates late collisions.
+answer: C
+explanation:
+Con velocità diverse configurate manualmente il link non si stabilisce: entrambe le interfacce restano down/down ("notconnect" sugli switch). Un duplex mismatch invece fa salire il link, ma con prestazioni pessime (collisioni, CRC).
+Se un solo lato ha l'autonegoziazione attiva, la velocità viene rilevata comunque tramite il segnale, mentre il duplex no.
+reference: Exam topic 1.4 - Mismatch duplex and/or speed
+[/Q]
+
+[Q]
+id: NF-031
+domain: 1
+type: FILL
+text:
+Which well-known TCP port number is used by HTTPS? (Enter a number.)
+answer: 443
+explanation:
+HTTPS = TCP 443 (HTTP su TLS). HTTP usa TCP 80. Altre porte da sapere: SSH 22, Telnet 23, DNS 53, DHCP 67/68, TFTP 69, NTP 123, SNMP 161/162, Syslog 514.
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-032
+domain: 1
+type: DRAG
+text:
+Match each protocol to the transport-layer protocol it primarily uses.
+items:
+HTTP => TCP
+SSH => TCP
+Telnet => TCP
+TFTP => UDP
+SNMP => UDP
+Syslog => UDP
+explanation:
+TCP per le applicazioni che richiedono affidabilità e sessioni (HTTP/HTTPS, SSH, Telnet, FTP, SMTP, BGP). UDP per le applicazioni semplici, veloci o con traffico in tempo reale (TFTP, SNMP, Syslog, DHCP, NTP, VoIP/RTP). DNS usa UDP per le query e TCP per zone transfer e risposte grandi.
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-033
+domain: 1
+type: SINGLE
+text:
+Which TCP header field is used by the receiver to control how much data the sender can transmit before waiting for an acknowledgment?
+options:
+A) Sequence number
+B) Window size
+C) Checksum
+D) Urgent pointer
+answer: B
+explanation:
+Il campo Window indica quanti byte il ricevitore può accettare senza conferma: è il meccanismo di flow control (sliding window). Il sequence number serve a riordinare i dati e a rilevare le perdite; l'acknowledgment number indica il prossimo byte atteso.
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-034
+domain: 1
+type: SINGLE
+text:
+An engineer must divide 192.168.1.0/24 into at least six subnets while providing the maximum number of hosts per subnet. Which prefix length should be used?
+options:
+A) /26
+B) /27
+C) /28
+D) /29
+answer: B
+explanation:
+Servono almeno 6 subnet: 2^2 = 4 non basta, 2^3 = 8 sì → si prendono in prestito 3 bit → /24 + 3 = /27.
+/27 offre 8 subnet da 30 host ciascuna. /28 darebbe 16 subnet ma solo 14 host per subnet (meno host del necessario rispetto al massimo possibile).
+reference: Exam topic 1.6 - Configure and verify IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-035
+domain: 1
+type: FILL
+text:
+What is the broadcast address of the subnet that contains host 10.45.67.89/20?
+answer: 10.45.79.255
+explanation:
+/20 = 255.255.240.0 → ottetto interessante: il 3°, block size 256 - 240 = 16.
+Multipli di 16: ..., 48, 64, 80... → 67 cade nel blocco 64-79.
+Rete 10.45.64.0, broadcast 10.45.79.255, host da 10.45.64.1 a 10.45.79.254.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-036
+domain: 1
+type: SINGLE
+text:
+Which IP address is in the same subnet as host 172.16.37.200/21?
+options:
+A) 172.16.40.1
+B) 172.16.31.254
+C) 172.16.39.10
+D) 172.16.48.5
+answer: C
+explanation:
+/21 = 255.255.248.0 → block size 8 nel 3° ottetto. 37 cade nel blocco 32-39 → subnet 172.16.32.0 - 172.16.39.255.
+Solo 172.16.39.10 è nel range. 172.16.40.1 appartiene già alla subnet successiva (40.0/21), 172.16.31.254 a quella precedente.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-037
+domain: 1
+type: SINGLE
+text:
+Using VLSM, which prefix length wastes the fewest addresses on a traditional point-to-point link between two routers, assuming /31 is not supported?
+options:
+A) /29
+B) /30
+C) /28
+D) /24
+answer: B
+explanation:
+Un /30 fornisce esattamente 2 indirizzi utilizzabili, uno per ciascun router. Con IOS moderni è possibile anche /31 (RFC 3021), che usa entrambi gli indirizzi senza rete né broadcast, dimezzando lo spreco.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting (VLSM)
+[/Q]
+
+[Q]
+id: NF-038
+domain: 1
+type: SINGLE
+text:
+Refer to the exhibit. A Windows PC cannot reach any network resources. What is the most likely cause?
+exhibit:
+C:\> ipconfig
+
+Ethernet adapter Ethernet0:
+   Connection-specific DNS Suffix  . :
+   Autoconfiguration IPv4 Address. . : 169.254.23.5
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Default Gateway . . . . . . . . . :
+options:
+A) The PC has a duplicate static IP address.
+B) The PC could not obtain an address from a DHCP server.
+C) The default gateway is configured on the wrong subnet.
+D) The DNS server is unreachable.
+answer: B
+explanation:
+Un indirizzo 169.254.x.x/16 (APIPA, link-local IPv4) viene autoassegnato quando il client DHCP non riceve risposta da un server. Cause tipiche: server DHCP spento, porta nella VLAN sbagliata, mancanza di "ip helper-address" sul gateway, DHCP snooping che blocca.
+reference: Exam topic 1.10 - Verify IP parameters for Client OS
+[/Q]
+
+[Q]
+id: NF-039
+domain: 1
+type: SINGLE
+text:
+During SLAAC, which ICMPv6 message provides the IPv6 prefix and default gateway information to a host?
+options:
+A) Neighbor Solicitation
+B) Neighbor Advertisement
+C) Router Solicitation
+D) Router Advertisement
+answer: D
+explanation:
+Il router invia periodicamente (o in risposta a un Router Solicitation, type 133) un Router Advertisement (ICMPv6 type 134) con prefisso, lunghezza del prefisso e flag M/O. L'host costruisce il proprio indirizzo (prefisso + interface ID EUI-64 o casuale) e usa l'indirizzo link-local del router come default gateway.
+reference: Exam topic 1.8 / 1.9 - IPv6 addressing (SLAAC)
+[/Q]
+
+[Q]
+id: NF-040
+domain: 1
+type: SINGLE
+text:
+Which interface command configures a Cisco router interface to obtain its IPv6 address by using SLAAC?
+options:
+A) ipv6 address dhcp
+B) ipv6 address autoconfig
+C) ipv6 address 2001:DB8::/64 eui-64
+D) ipv6 enable
+answer: B
+explanation:
+- "ipv6 address autoconfig": SLAAC (prefisso dal RA)
+- "ipv6 address dhcp": client DHCPv6
+- "ipv6 address <prefisso>/64 eui-64": statico con interface ID EUI-64
+- "ipv6 enable": attiva IPv6 creando solo l'indirizzo link-local
+reference: Exam topic 1.8 - Configure and verify IPv6 addressing and prefix
+[/Q]
+
+[Q]
+id: NF-041
+domain: 1
+type: SINGLE
+text:
+Which IPv6 address type is the equivalent of RFC 1918 private addressing and is not routed on the Internet?
+options:
+A) Global unicast
+B) Link-local
+C) Unique local
+D) Multicast
+answer: C
+explanation:
+Gli indirizzi unique local (FC00::/7, in pratica FD00::/8 con un Global ID a 40 bit casuale) sono usati all'interno delle organizzazioni e non sono instradati su Internet. I link-local (FE80::/10) invece non escono nemmeno dal singolo link.
+reference: Exam topic 1.9.b - Unique local
+[/Q]
+
+[Q]
+id: NF-042
+domain: 1
+type: SINGLE
+text:
+What is the solicited-node multicast address for the IPv6 unicast address 2001:DB8::1:2:3:4?
+options:
+A) FF02::1:FF03:4
+B) FF02::1:FF00:4
+C) FF02::2
+D) FF05::1:3
+answer: A
+explanation:
+Solicited-node multicast = FF02::1:FF + gli ultimi 24 bit dell'indirizzo unicast.
+2001:DB8::1:2:3:4 esteso termina con 0003:0004 → ultimi 24 bit = 03:0004 → FF02::1:FF03:4.
+È usato da NDP (Neighbor Solicitation) per la risoluzione degli indirizzi al posto del broadcast ARP.
+reference: Exam topic 1.9.c - Multicast
+[/Q]
+
+[Q]
+id: NF-043
+domain: 1
+type: SINGLE
+text:
+Which ICMPv6 message does a host send to perform Duplicate Address Detection (DAD) before using a new IPv6 address?
+options:
+A) Router Solicitation
+B) Neighbor Solicitation
+C) Echo Request
+D) Redirect
+answer: B
+explanation:
+Durante il DAD l'host invia un Neighbor Solicitation (type 135) verso il solicited-node multicast del proprio indirizzo candidato, usando come sorgente l'indirizzo non specificato (::). Se riceve un Neighbor Advertisement, l'indirizzo è già in uso.
+reference: Exam topic 1.9 - IPv6 address types / NDP
+[/Q]
+
+[Q]
+id: NF-044
+domain: 1
+type: MULTI
+text:
+Which two statements about the IPv6 header compared to the IPv4 header are true?
+options:
+A) IPv6 uses broadcast messages to resolve Layer 2 addresses.
+B) The IPv6 base header has a fixed length of 40 bytes.
+C) The IPv6 header does not include a header checksum.
+D) Routers fragment IPv6 packets in transit when needed.
+E) IPv6 addresses are 64 bits long.
+answer: B, C
+explanation:
+L'header IPv6 è semplificato: lunghezza fissa di 40 byte, niente checksum (già presente a Layer 2 e Layer 4), niente frammentazione da parte dei router (la fa solo la sorgente, grazie a Path MTU Discovery), opzioni spostate in extension header. Gli indirizzi sono di 128 bit e non esiste il broadcast.
+reference: Exam topic 1.8 - IPv6 addressing
+[/Q]
+
+[Q]
+id: NF-045
+domain: 1
+type: SINGLE
+text:
+Which command displays the IP addresses assigned to the interfaces of a Linux host?
+options:
+A) ipconfig /all
+B) ip address show
+C) show ip interface brief
+D) netsh interface show
+answer: B
+explanation:
+Su Linux: "ip address show" (o "ip a"), il vecchio "ifconfig", "ip route" per la tabella di routing e il gateway. Su Windows: "ipconfig /all". Su macOS: "ifconfig" e "netstat -rn". "show ip interface brief" è un comando Cisco IOS.
+reference: Exam topic 1.10 - Verify IP parameters for Client OS (Windows, Mac OS, Linux)
+[/Q]
+
+[Q]
+id: NF-046
+domain: 1
+type: SINGLE
+text:
+Which command on macOS displays the routing table, including the default gateway?
+options:
+A) route print
+B) netstat -rn
+C) ipconfig /displaydns
+D) show ip route
+answer: B
+explanation:
+"netstat -rn" mostra la tabella di routing (la riga "default" indica il gateway) su macOS e Linux. Su Windows l'equivalente è "route print" oppure "netstat -r".
+reference: Exam topic 1.10 - Verify IP parameters for Client OS
+[/Q]
+
+[Q]
+id: NF-047
+domain: 1
+type: SINGLE
+text:
+Which statement correctly compares the 5 GHz band with the 2.4 GHz band?
+options:
+A) 5 GHz offers more non-overlapping channels but generally has a shorter range.
+B) 5 GHz offers longer range and better wall penetration.
+C) 5 GHz supports only three non-overlapping channels.
+D) 5 GHz is more affected by microwave ovens and Bluetooth devices.
+answer: A
+explanation:
+La banda a 5 GHz ha molti più canali non sovrapposti (oltre 20, a seconda del paese) e meno interferenze (forni a microonde e Bluetooth lavorano a 2,4 GHz). A frequenza più alta però l'attenuazione aumenta, quindi la portata e la penetrazione nei muri sono minori.
+reference: Exam topic 1.11 - Describe wireless principles
+[/Q]
+
+[Q]
+id: NF-048
+domain: 1
+type: SINGLE
+text:
+What does the BSSID identify in an 802.11 wireless network?
+options:
+A) The human-readable name of the wireless network
+B) The MAC address of the access point radio that serves the BSS
+C) The VLAN to which wireless clients are mapped
+D) The encryption key used by the WLAN
+answer: B
+explanation:
+SSID = nome della rete (fino a 32 caratteri). BSSID = MAC address della radio dell'AP per quel BSS (un AP che trasmette più SSID usa un BSSID diverso per ciascuno). ESS = più AP con lo stesso SSID collegati dal distribution system, che permette il roaming.
+reference: Exam topic 1.11.b - SSID / RF
+[/Q]
+
+[Q]
+id: NF-049
+domain: 1
+type: SINGLE
+text:
+Which media access method is used by 802.11 wireless networks?
+options:
+A) CSMA/CD
+B) CSMA/CA
+C) Token passing
+D) TDMA
+answer: B
+explanation:
+Il Wi-Fi è un mezzo condiviso e half-duplex in cui le collisioni non possono essere rilevate mentre si trasmette: si usa CSMA/CA (Collision Avoidance) con attese casuali (backoff), ACK per ogni frame ed eventualmente RTS/CTS. CSMA/CD era usato dall'Ethernet half-duplex.
+reference: Exam topic 1.11 - Describe wireless principles
+[/Q]
+
+[Q]
+id: NF-050
+domain: 1
+type: SINGLE
+text:
+Which statement describes containers compared to virtual machines?
+options:
+A) Each container includes its own full guest operating system.
+B) Containers share the host operating system kernel and are lighter and faster to start.
+C) Containers require a Type 1 hypervisor.
+D) Containers cannot run on cloud platforms.
+answer: B
+explanation:
+Una VM contiene un sistema operativo completo, eseguito sopra un hypervisor. I container (es. Docker) includono solo l'applicazione e le sue dipendenze e condividono il kernel dell'host: occupano meno risorse e partono in pochi secondi. Orchestrazione tipica: Kubernetes.
+reference: Exam topic 1.12 - Virtualization fundamentals (containers)
+[/Q]
+
+[Q]
+id: NF-051
+domain: 1
+type: SINGLE
+text:
+What is the purpose of a VRF (Virtual Routing and Forwarding) instance on a router?
+options:
+A) To create multiple independent routing tables on the same router, allowing overlapping IP addresses
+B) To provide redundancy for the default gateway
+C) To virtualize the router operating system as a container
+D) To encrypt traffic between two routers
+answer: A
+explanation:
+Le VRF dividono un router fisico in più router logici, ciascuno con la propria tabella di routing e le proprie interfacce. Clienti diversi possono quindi usare gli stessi indirizzi (es. 10.0.0.0/8) senza conflitti. Sono usate dai service provider (MPLS VPN) e per segmentare reti aziendali.
+reference: Exam topic 1.12 - Virtualization fundamentals (VRFs)
+[/Q]
+
+[Q]
+id: NF-052
+domain: 1
+type: FILL
+text:
+What is the default MAC address table aging time, in seconds, on Cisco Catalyst switches? (Enter a number.)
+answer: 300
+explanation:
+Le entry dinamiche vengono rimosse dopo 300 secondi (5 minuti) senza traffico da quel MAC sorgente. Si modifica con "mac address-table aging-time <secondi>". Le entry statiche e quelle sticky della port security non scadono.
+reference: Exam topic 1.13 - Switching concepts (MAC learning and aging)
+[/Q]
+
+[Q]
+id: NF-053
+domain: 1
+type: SINGLE
+text:
+PC1 (192.168.1.10/24) sends a packet to a server at 10.5.5.5. Which destination MAC address does PC1 place in the Ethernet frame?
+options:
+A) The MAC address of the server
+B) The broadcast MAC address FFFF.FFFF.FFFF
+C) The MAC address of its default gateway
+D) The MAC address of the DNS server
+answer: C
+explanation:
+La destinazione è in un'altra subnet, quindi PC1 invia il frame al proprio default gateway: fa ARP per l'IP del gateway e usa il suo MAC come destinazione Layer 2. L'IP di destinazione resta 10.5.5.5. Gli indirizzi IP restano invariati end-to-end (salvo NAT), quelli MAC cambiano a ogni hop.
+reference: Exam topic 1.13 / 3.2 - Switching concepts and forwarding
+[/Q]
+
+[Q]
+id: NF-054
+domain: 1
+type: SINGLE
+text:
+How does traceroute discover each router along the path to a destination?
+options:
+A) It sends packets with increasing TTL values and receives ICMP Time Exceeded messages from each hop.
+B) It sends ARP requests to every router in the path.
+C) It reads the routing table of each router through SNMP.
+D) It uses the Record Route option in every packet.
+answer: A
+explanation:
+Traceroute invia pacchetti con TTL = 1, 2, 3... Ogni router che decrementa il TTL a 0 scarta il pacchetto e risponde con un ICMP Time Exceeded (type 11), rivelando così il proprio indirizzo. Su Windows il comando è "tracert" (usa ICMP), su Cisco IOS e Linux "traceroute" (di default usa UDP).
+reference: Exam topic 1.1 / 1.10 - Network components and troubleshooting
+[/Q]
+
+[Q]
+id: NF-055
+domain: 1
+type: FILL
+text:
+How many point-to-point links are required to connect five sites in a full-mesh WAN topology? (Enter a number.)
+answer: 10
+explanation:
+Full mesh: n(n-1)/2 link = 5 × 4 / 2 = 10. Una topologia hub-and-spoke con 5 siti richiede invece solo 4 link (n-1), con meno costi ma un singolo punto di guasto nell'hub. La partial mesh è un compromesso tra le due.
+reference: Exam topic 1.2 - Network topology architectures (WAN)
+[/Q]
+
+[Q]
+id: NF-056
+domain: 1
+type: SINGLE
+text:
+Which characteristic is typical of a public cloud service compared to an on-premises deployment?
+options:
+A) The organization buys and maintains all physical servers in its own data center.
+B) Resources are provisioned on demand and billed based on usage.
+C) Capacity can be increased only by purchasing new hardware.
+D) The organization has full physical access to the hardware.
+answer: B
+explanation:
+Caratteristiche del cloud (definizione NIST): on-demand self-service, broad network access, resource pooling, rapid elasticity, measured service (pagamento a consumo). On-premises: CAPEX elevato, l'azienda gestisce hardware, alimentazione e raffreddamento.
+reference: Exam topic 1.2.f - On-premises and cloud
+[/Q]
+
+[Q]
+id: NF-057
+domain: 1
+type: SINGLE
+text:
+What is the main difference between an IDS and an IPS?
+options:
+A) An IDS is deployed inline and blocks malicious traffic; an IPS only generates alerts.
+B) An IPS is deployed inline and can drop malicious traffic in real time; an IDS analyzes a copy of the traffic and generates alerts.
+C) An IDS encrypts traffic and an IPS decrypts it.
+D) There is no difference; the terms are interchangeable.
+answer: B
+explanation:
+IDS: riceve una copia del traffico (SPAN/TAP), rileva e allerta, ma non può bloccare il primo pacchetto. IPS: è inline, quindi può scartare il traffico in tempo reale, ma aggiunge latenza e deve essere dimensionato correttamente. Entrambi usano firme e rilevamento di anomalie.
+reference: Exam topic 1.1.c - Next-generation firewalls and IPS
+[/Q]
+
+[Q]
+id: NF-058
+domain: 1
+type: SINGLE
+text:
+A link must cross a factory floor with heavy electromagnetic interference from industrial machines. Which media type is the best choice?
+options:
+A) Cat 5e UTP
+B) Cat 6 UTP
+C) Fiber optic cable
+D) Coaxial cable
+answer: C
+explanation:
+La fibra ottica trasmette luce, quindi è immune alle interferenze elettromagnetiche e non crea loop di massa tra edifici. Il rame schermato (STP) riduce le interferenze ma non le elimina.
+reference: Exam topic 1.3 - Compare physical interface and cabling types
+[/Q]
+
+[Q]
+id: NF-059
+domain: 1
+type: FILL
+text:
+What is the default IP MTU, in bytes, of an Ethernet interface? (Enter a number.)
+answer: 1500
+explanation:
+L'MTU Ethernet standard è 1500 byte di payload (il frame completo arriva a 1518 byte, 1522 con il tag 802.1Q). Frame più grandi sono "jumbo frame" (fino a circa 9000 byte) e vanno abilitati esplicitamente. MTU diverse tra vicini OSPF bloccano l'adiacenza in EXSTART/EXCHANGE.
+reference: Exam topic 1.4 / 3.4 - Interfaces and OSPF
+[/Q]
+
+[Q]
+id: NF-060
+domain: 1
+type: MULTI
+text:
+Which two statements about full-duplex Ethernet are true?
+options:
+A) Both devices can transmit and receive at the same time.
+B) It requires the use of a hub.
+C) CSMA/CD is used to detect collisions.
+D) Collisions cannot occur on the link.
+E) Only one device can transmit at a time.
+answer: A, D
+explanation:
+In full-duplex ci sono coppie (o fibre) separate per trasmissione e ricezione: i due lati trasmettono contemporaneamente, non ci sono collisioni e CSMA/CD è disabilitato. Il full-duplex richiede un collegamento punto-punto (switch, router, NIC), non un hub.
+reference: Exam topic 1.4 - Interface issues (duplex)
+[/Q]
+
+[Q]
+id: NF-061
+domain: 1
+type: SINGLE
+text:
+Which IP address can be assigned to a host in subnet 10.10.10.0/29?
+options:
+A) 10.10.10.0
+B) 10.10.10.7
+C) 10.10.10.6
+D) 10.10.10.8
+answer: C
+explanation:
+/29 = block size 8 → subnet 10.10.10.0 - 10.10.10.7. .0 è l'indirizzo di rete, .7 il broadcast, .8 appartiene alla subnet successiva. Host validi: da .1 a .6.
+reference: Exam topic 1.6 - IPv4 addressing and subnetting
+[/Q]
+
+[Q]
+id: NF-062
+domain: 1
+type: SINGLE
+text:
+Which TCP mechanism allows the receiver to reassemble segments in the correct order and detect missing data?
+options:
+A) Port numbers
+B) Sequence and acknowledgment numbers
+C) The urgent flag
+D) The checksum field
+answer: B
+explanation:
+Ogni byte TCP è numerato: il ricevitore usa i sequence number per riordinare i segmenti e rilevare quelli mancanti, e conferma con l'acknowledgment number (il prossimo byte atteso). I segmenti non confermati entro il timeout vengono ritrasmessi.
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]
+
+[Q]
+id: NF-063
+domain: 1
+type: SINGLE
+text:
+A server is handling many simultaneous HTTPS sessions from the same client PC. How does the server distinguish between these sessions?
+options:
+A) By the destination MAC address
+B) By the different source port numbers chosen by the client
+C) By the TTL value of each packet
+D) By the DSCP value of each packet
+answer: B
+explanation:
+Una sessione è identificata dalla 5-tupla (IP sorgente, IP destinazione, protocollo, porta sorgente, porta destinazione). Il client sceglie una porta sorgente effimera diversa (49152-65535) per ogni connessione verso la stessa porta 443 del server: questo è il multiplexing di Layer 4.
+reference: Exam topic 1.5 - Compare TCP to UDP
+[/Q]

@@ -1,0 +1,50 @@
+<html><body>
+<h1>Sicurezza</h1>
+<h2>ACL</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Tipo</th><th>Numeri</th><th>Filtra su</th><th>Posizione</th></tr>
+<tr><td>Standard</td><td>1-99, 1300-1999</td><td>IP sorgente</td><td>vicino alla destinazione</td></tr>
+<tr><td>Estesa</td><td>100-199, 2000-2699</td><td>sorgente, destinazione, protocollo, porte</td><td>vicino alla sorgente</td></tr>
+</table>
+<ul>
+<li>Elaborazione top-down, prima corrispondenza, <b>deny any implicito</b> alla fine.</li>
+<li>Una ACL per interfaccia, per direzione, per protocollo.</li>
+<li>Wildcard = 255.255.255.255 - maschera. <code>host X</code> = X 0.0.0.0, <code>any</code> = 0.0.0.0 255.255.255.255.</li>
+</ul>
+<pre>
+ip access-list extended WEB
+ 10 permit tcp 192.168.10.0 0.0.0.255 any eq 443
+ 20 deny ip any any log
+interface g0/1
+ ip access-group WEB in
+line vty 0 4
+ access-class 10 in
+</pre>
+<h2>Sicurezza Layer 2</h2>
+<ul>
+<li><b>Port security</b>: violation protect / restrict / shutdown (default) · sticky MAC · max 1 di default.</li>
+<li><b>DHCP snooping</b>: porte untrusted di default; trust verso il server legittimo; crea la binding table.</li>
+<li><b>Dynamic ARP Inspection</b>: verifica gli ARP con la binding table; <code>ip arp inspection vlan 10</code>.</li>
+<li>Recupero err-disabled: <code>shutdown</code>/<code>no shutdown</code> o <code>errdisable recovery cause ...</code></li>
+</ul>
+<h2>AAA</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>TACACS+</th><th>RADIUS</th></tr>
+<tr><td>Standard</td><td>Cisco</td><td>IETF</td></tr>
+<tr><td>Trasporto</td><td>TCP 49</td><td>UDP 1812/1813</td></tr>
+<tr><td>Cifratura</td><td>intero payload</td><td>solo password</td></tr>
+<tr><td>AAA</td><td>separati</td><td>authN + authZ combinati</td></tr>
+<tr><td>Uso tipico</td><td>amministrazione dispositivi</td><td>accesso alla rete (802.1X, VPN)</td></tr>
+</table>
+<h2>Password su IOS</h2>
+<p><code>enable secret</code> (hash, preferito) · <code>service password-encryption</code> (type 7, debole) ·
+<code>username admin secret ...</code> · <code>login local</code> · <code>security passwords min-length 10</code> ·
+<code>login block-for 120 attempts 3 within 60</code></p>
+<h2>Concetti</h2>
+<ul>
+<li>Minacce: malware (virus, worm, trojan, ransomware), DoS/DDoS, spoofing, MITM, reconnaissance, password attack, social engineering.</li>
+<li>Programma di sicurezza: user awareness, training, controllo degli accessi fisici.</li>
+<li>MFA: qualcosa che sai + che hai + che sei. Certificati e PKI. Biometria.</li>
+<li>VPN: site-to-site IPsec (tra gateway) vs remote access (client TLS/IPsec).</li>
+</ul>
+</body></html>

@@ -1,0 +1,34 @@
+# File personali (docs, appunti, script): restano solo in locale, non vanno su git
+local/
+
+# Gradle e output di build
+.gradle/
+build/
+out/
+*.class
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Configurazione locale di Android Studio (contiene il percorso dell'SDK sul tuo PC)
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Chiavi di firma: mai su git
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

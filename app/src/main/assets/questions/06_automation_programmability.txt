@@ -1,0 +1,636 @@
+# =====================================================================
+# Dominio 6.0 - Automation and Programmability (10%)
+# =====================================================================
+
+[Q]
+id: AUT-001
+domain: 6
+type: SINGLE
+text:
+In a controller-based network, which interface does an application use to communicate with the SDN controller?
+options:
+A) Southbound API
+B) Northbound API
+C) Eastbound API
+D) Console port
+answer: B
+explanation:
+Northbound API: tra controller e applicazioni/script (tipicamente REST con JSON). Southbound API: tra controller e dispositivi di rete (es. NETCONF, RESTCONF, OpenFlow, OpFlex, SSH/CLI). Eastbound/westbound collegano controller tra loro.
+reference: Exam topic 6.2 - Compare traditional networks with controller-based networking
+[/Q]
+
+[Q]
+id: AUT-002
+domain: 6
+type: DRAG
+text:
+Match each network plane to the function it performs.
+items:
+Forwarding frames and packets based on tables => Data plane
+Building routing tables with OSPF and calculating STP topology => Control plane
+Configuring and monitoring devices via SSH and SNMP => Management plane
+explanation:
+- Data plane: inoltro effettivo del traffico (switching, ACL, NAT, incapsulamento)
+- Control plane: decisioni su come inoltrare (protocolli di routing, STP, ARP)
+- Management plane: gestione del dispositivo (SSH, SNMP, Syslog, NTP, API)
+Nell'SDN il control plane viene in buona parte centralizzato nel controller.
+reference: Exam topic 6.1 - Explain how automation impacts network management / 6.2 SDN planes
+[/Q]
+
+[Q]
+id: AUT-003
+domain: 6
+type: DRAG
+text:
+Match each HTTP verb used by REST APIs to the corresponding CRUD operation.
+items:
+POST => Create
+GET => Read
+PUT => Update (replace)
+PATCH => Update (partial)
+DELETE => Delete
+explanation:
+Corrispondenza CRUD ↔ HTTP: Create = POST, Read = GET, Update = PUT (sostituzione completa) o PATCH (modifica parziale), Delete = DELETE.
+reference: Exam topic 6.5 - Describe characteristics of REST-based APIs (authentication types, CRUD, HTTP verbs, and data encoding)
+[/Q]
+
+[Q]
+id: AUT-004
+domain: 6
+type: SINGLE
+text:
+A REST API call returns HTTP status code 401. What does this code indicate?
+options:
+A) The request succeeded and a new resource was created.
+B) The client is not authenticated or the credentials are invalid.
+C) The requested resource does not exist.
+D) An internal error occurred on the server.
+answer: B
+explanation:
+Codici HTTP da conoscere:
+- 2xx successo: 200 OK, 201 Created, 204 No Content
+- 4xx errore client: 400 Bad Request, 401 Unauthorized (autenticazione mancante/errata), 403 Forbidden (autenticato ma senza permessi), 404 Not Found
+- 5xx errore server: 500 Internal Server Error, 503 Service Unavailable
+reference: Exam topic 6.5 - REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-005
+domain: 6
+type: SINGLE
+text:
+Refer to the exhibit. Which JSON data type is the value of the "interfaces" key?
+exhibit:
+{
+  "hostname": "R1",
+  "uptime_days": 42,
+  "interfaces": [
+    {"name": "GigabitEthernet0/0", "enabled": true, "mtu": 1500},
+    {"name": "GigabitEthernet0/1", "enabled": false, "mtu": 1500}
+  ]
+}
+options:
+A) Object
+B) Array
+C) String
+D) Boolean
+answer: B
+explanation:
+In JSON le parentesi quadre [ ] delimitano un array (lista ordinata); le graffe { } un oggetto (coppie chiave:valore). Qui "interfaces" è un array di oggetti.
+Tipi JSON: string ("R1"), number (42), boolean (true/false, minuscolo e senza virgolette), null, object, array.
+reference: Exam topic 6.7 - Recognize components of JSON-encoded data
+[/Q]
+
+[Q]
+id: AUT-006
+domain: 6
+type: SINGLE
+text:
+Refer to the exhibit. Why is this JSON document invalid?
+exhibit:
+{
+  "vlan": 10,
+  "name": 'USERS',
+  "active": true
+}
+options:
+A) Numbers must be enclosed in double quotes.
+B) Strings must be enclosed in double quotes, not single quotes.
+C) Boolean values must be written as TRUE.
+D) Keys cannot contain lowercase letters.
+answer: B
+explanation:
+In JSON stringhe e chiavi DEVONO usare le doppie virgolette. Altri errori tipici: virgola dopo l'ultimo elemento (trailing comma), commenti (non ammessi), True/False con la maiuscola. I numeri e i booleani non vanno tra virgolette.
+reference: Exam topic 6.7 - JSON-encoded data
+[/Q]
+
+[Q]
+id: AUT-007
+domain: 6
+type: MULTI
+text:
+Which two statements describe Ansible?
+options:
+A) It is agentless and typically connects to devices over SSH.
+B) It requires an agent installed on every managed node.
+C) It uses playbooks written in YAML.
+D) It uses manifests written in a Ruby-based DSL.
+E) It uses a pull model in which nodes periodically request their configuration.
+answer: A, C
+explanation:
+Ansible: agentless, modello push, playbook in YAML, connessione via SSH (o API).
+Puppet: agent-based (anche agentless per alcuni device), modello pull, "manifest" in DSL Puppet.
+Chef: agent-based, pull, "recipe" e "cookbook" in Ruby.
+reference: Exam topic 6.6 - Recognize the capabilities of configuration management mechanisms such as Ansible and Terraform
+[/Q]
+
+[Q]
+id: AUT-008
+domain: 6
+type: SINGLE
+text:
+What is a benefit of Cisco Catalyst Center (formerly DNA Center) compared to traditional box-by-box network management?
+options:
+A) Each device must be configured manually through its CLI.
+B) It provides centralized, policy-based (intent-based) management with automation and assurance.
+C) It removes the need for a data plane on network devices.
+D) It works only with devices from multiple vendors, not Cisco devices.
+answer: B
+explanation:
+Gestione tradizionale: configurazione dispositivo per dispositivo (CLI), soggetta a errori e incoerenze. Catalyst Center: controller centralizzato con policy di intento, provisioning automatico, telemetria e "assurance" (analisi dello stato della rete, anche con AI/ML), API northbound REST. I dispositivi mantengono comunque il proprio data plane.
+reference: Exam topic 6.4 - Compare traditional campus device management with Cisco Catalyst Center enabled device management
+[/Q]
+
+[Q]
+id: AUT-009
+domain: 6
+type: MULTI
+text:
+Which two are architectural constraints of REST?
+options:
+A) Stateless client-server communication
+B) The server stores each client's session state between requests
+C) Cacheable responses
+D) Mandatory use of XML encoding
+E) Communication only over UDP
+answer: A, C
+explanation:
+Vincoli REST: architettura client-server, stateless (ogni richiesta contiene tutto il necessario, ad esempio il token di autenticazione), cacheable, interfaccia uniforme (URI + verbi HTTP), sistema a livelli, code-on-demand (opzionale). Il formato dati può essere JSON, XML o altro; il trasporto è HTTP(S) su TCP.
+reference: Exam topic 6.5 - Characteristics of REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-010
+domain: 6
+type: SINGLE
+text:
+Which data serialization format uses indentation (whitespace) to represent data structure and is commonly used for Ansible playbooks?
+options:
+A) JSON
+B) XML
+C) YAML
+D) CSV
+answer: C
+explanation:
+YAML usa l'indentazione con spazi (mai tab) per la struttura, "- " per gli elementi di una lista e "chiave: valore" per i dizionari. JSON usa {} e [], XML usa tag di apertura e chiusura.
+reference: Exam topic 6.6 / 6.7 - Data formats
+[/Q]
+
+[Q]
+id: AUT-011
+domain: 6
+type: SINGLE
+text:
+How can predictive AI (machine learning) improve network operations?
+options:
+A) It replaces all routing protocols with static routes.
+B) It analyzes historical and real-time telemetry to anticipate failures or performance issues before they affect users.
+C) It encrypts traffic between access points and controllers.
+D) It assigns IP addresses to clients instead of DHCP.
+answer: B
+explanation:
+L'AI predittiva/ML apprende i comportamenti "normali" dalla telemetria e rileva anomalie, prevede guasti e problemi di capacità e suggerisce rimedi (AIOps). L'AI generativa produce contenuti (es. configurazioni, riepiloghi, risposte in linguaggio naturale) che vanno sempre verificati prima dell'uso.
+reference: Exam topic 6.3 - Describe AI (generative and predictive) and machine learning in network operations
+[/Q]
+
+[Q]
+id: AUT-012
+domain: 6
+type: SINGLE
+text:
+In a software-defined fabric such as Cisco SD-Access, what is the underlay?
+options:
+A) The virtual network of tunnels (for example VXLAN) built between fabric devices
+B) The physical network and the IP routing that provides connectivity between fabric devices
+C) The set of policies applied by the controller
+D) The northbound API of the controller
+answer: B
+explanation:
+Underlay: rete fisica (switch, link) e il routing IP che li collega (es. IS-IS o OSPF). Overlay: rete logica costruita sopra con tunnel (VXLAN nel data plane, LISP nel control plane per SD-Access). Fabric: l'insieme di underlay + overlay gestito come un'unica entità.
+reference: Exam topic 6.2.a - Overlay, underlay, and fabric
+[/Q]
+
+[Q]
+id: AUT-013
+domain: 6
+type: SINGLE
+text:
+Which statement about Terraform is true?
+options:
+A) It is an agent-based tool that requires Ruby recipes.
+B) It is an Infrastructure as Code tool that uses declarative configuration files to provision and manage resources.
+C) It is a network monitoring protocol similar to SNMP.
+D) It can only be used to configure Cisco IOS devices through the CLI.
+answer: B
+explanation:
+Terraform (HashiCorp) è uno strumento IaC dichiarativo: si descrive lo stato desiderato in file HCL e Terraform calcola il piano ("terraform plan") e lo applica ("terraform apply") tramite provider (cloud, piattaforme di rete, controller). Mantiene un file di stato con le risorse gestite.
+reference: Exam topic 6.6 - Configuration management mechanisms such as Ansible and Terraform
+[/Q]
+
+# ---------------------------------------------------------------------
+# Espansione banca dati - Automation and Programmability
+# ---------------------------------------------------------------------
+
+[Q]
+id: AUT-014
+domain: 6
+type: SINGLE
+text:
+What is a primary benefit of network automation compared to manual device-by-device configuration?
+options:
+A) It eliminates the need for routing protocols.
+B) It improves consistency and reduces human configuration errors, while making changes faster at scale.
+C) It removes the need for network monitoring.
+D) It guarantees that no outages can occur.
+answer: B
+explanation:
+Vantaggi dell'automazione: configurazioni coerenti basate su template, meno errori di battitura, rollout rapidi su centinaia di dispositivi, verifica della conformità, documentazione implicita (infrastructure as code), integrazione con altri sistemi (ticketing, CI/CD).
+reference: Exam topic 6.1 - Explain how automation impacts network management
+[/Q]
+
+[Q]
+id: AUT-015
+domain: 6
+type: SINGLE
+text:
+Which statement about NETCONF is true?
+options:
+A) It uses HTTP GET and POST over port 80.
+B) It runs over SSH (TCP port 830) and encodes data in XML based on YANG models.
+C) It is a northbound API used only by web browsers.
+D) It uses JSON over UDP.
+answer: B
+explanation:
+NETCONF (RFC 6241): trasporto SSH su TCP 830, codifica XML, modelli dati YANG, operazioni come get, get-config, edit-config, commit (con datastore candidate e running). RESTCONF offre funzioni simili su HTTPS con JSON o XML.
+reference: Exam topic 6.2 / 6.5 - Southbound APIs and data encoding
+[/Q]
+
+[Q]
+id: AUT-016
+domain: 6
+type: SINGLE
+text:
+Which statement describes RESTCONF?
+options:
+A) It uses SNMP traps to change device configuration.
+B) It provides a REST-like HTTPS interface to YANG-modeled data, using JSON or XML encoding.
+C) It requires a separate agent installed on the device.
+D) It uses Telnet as the transport.
+answer: B
+explanation:
+RESTCONF (RFC 8040) espone i dati dei modelli YANG tramite URI e verbi HTTP (GET, POST, PUT, PATCH, DELETE) su HTTPS, con JSON o XML. Esempio di URI su IOS XE: https://router/restconf/data/ietf-interfaces:interfaces
+reference: Exam topic 6.5 - REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-017
+domain: 6
+type: SINGLE
+text:
+What is YANG?
+options:
+A) A transport protocol for network management
+B) A data modeling language that defines the structure of configuration and operational data
+C) A configuration management tool similar to Ansible
+D) A JSON parser included in Cisco IOS
+answer: B
+explanation:
+YANG descrive in modo formale quali dati di configurazione e di stato esistono (es. interfacce, VLAN), con tipi, vincoli e gerarchia. NETCONF e RESTCONF trasportano dati conformi a questi modelli, codificati in XML o JSON. Esistono modelli standard (IETF, OpenConfig) e modelli nativi dei vendor.
+reference: Exam topic 6.2 / 6.5 - Programmability concepts
+[/Q]
+
+[Q]
+id: AUT-018
+domain: 6
+type: SINGLE
+text:
+Refer to the exhibit. Which JSON data type is the value of the "vlan_id" key?
+exhibit:
+{
+  "vlan_id": "10",
+  "name": "USERS",
+  "ports": 24,
+  "voice": false
+}
+options:
+A) Number
+B) String
+C) Boolean
+D) Array
+answer: B
+explanation:
+"10" è tra doppie virgolette, quindi è una stringa, anche se contiene cifre. 24 (senza virgolette) è un number, false un boolean. Attenzione a questo trucco nelle domande sul JSON.
+reference: Exam topic 6.7 - Recognize components of JSON-encoded data
+[/Q]
+
+[Q]
+id: AUT-019
+domain: 6
+type: FILL
+text:
+Refer to the exhibit. How many elements does the "devices" array contain? (Enter a number.)
+exhibit:
+{
+  "devices": [
+    {"name": "SW1", "role": "access"},
+    {"name": "SW2", "role": "access"},
+    {"name": "R1", "role": "edge"}
+  ],
+  "site": "Milano"
+}
+answer: 3
+explanation:
+L'array (tra parentesi quadre) contiene tre oggetti separati da virgole, ciascuno con due coppie chiave/valore. "site" è una chiave dell'oggetto principale, non un elemento dell'array.
+reference: Exam topic 6.7 - JSON-encoded data
+[/Q]
+
+[Q]
+id: AUT-020
+domain: 6
+type: SINGLE
+text:
+In the REST API URI https://catalyst.example.com/dna/intent/api/v1/network-device?family=Switches, what does "?family=Switches" represent?
+options:
+A) The API version
+B) A query parameter used to filter the results
+C) The authentication token
+D) The HTTP method
+answer: B
+explanation:
+Parti di un URI REST: schema (https), host (catalyst.example.com), percorso della risorsa (/dna/intent/api/v1/network-device, che include la versione v1), query string (dopo "?", coppie chiave=valore separate da "&") per filtrare o paginare. Il metodo HTTP e il token viaggiano nella richiesta, non nell'URI.
+reference: Exam topic 6.5 - REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-021
+domain: 6
+type: SINGLE
+text:
+To use the Cisco Catalyst Center (DNA Center) REST API, a script first requests an authentication token. Which HTTP method is used to request the token, and where is the token sent in later requests?
+options:
+A) GET; in the URI query string
+B) POST; in the X-Auth-Token HTTP header
+C) PUT; in the JSON body of every request
+D) DELETE; in a cookie
+answer: B
+explanation:
+Il client invia una POST a /dna/system/api/v1/auth/token con autenticazione HTTP Basic (utente e password codificati in Base64). La risposta contiene il token, da includere nell'header "X-Auth-Token" delle richieste successive. Il token scade dopo un certo tempo.
+reference: Exam topic 6.5 - REST-based APIs (authentication types)
+[/Q]
+
+[Q]
+id: AUT-022
+domain: 6
+type: SINGLE
+text:
+A script authenticates successfully to a REST API but receives HTTP 403 when it tries to delete a resource. What does this mean?
+options:
+A) The resource does not exist.
+B) The client is authenticated but not authorized to perform the operation.
+C) The server is overloaded.
+D) The request was successful but returned no content.
+answer: B
+explanation:
+401 Unauthorized = autenticazione mancante o non valida. 403 Forbidden = identità nota ma permessi insufficienti (es. utente in sola lettura). 404 = risorsa inesistente; 204 = successo senza contenuto (tipico di una DELETE riuscita).
+reference: Exam topic 6.5 - REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-023
+domain: 6
+type: SINGLE
+text:
+Which HTTP status code typically indicates that a POST request successfully created a new resource?
+options:
+A) 200 OK
+B) 201 Created
+C) 301 Moved Permanently
+D) 400 Bad Request
+answer: B
+explanation:
+201 Created è la risposta tipica a una POST che crea una risorsa (spesso con l'header Location della nuova risorsa). 200 OK è la risposta generica di successo (es. GET). 400 indica una richiesta malformata (es. JSON non valido).
+reference: Exam topic 6.5 - REST-based APIs
+[/Q]
+
+[Q]
+id: AUT-024
+domain: 6
+type: SINGLE
+text:
+In a software-defined networking (SDN) architecture, which plane is centralized in the controller?
+options:
+A) Data plane
+B) Control plane
+C) Physical plane
+D) Power plane
+answer: B
+explanation:
+Nell'SDN il control plane (le decisioni su come instradare/inoltrare) è centralizzato, del tutto o in parte, nel controller, che programma i dispositivi tramite le API southbound. Il data plane resta distribuito sui dispositivi, che inoltrano il traffico in hardware.
+reference: Exam topic 6.2 - Compare traditional networks with controller-based networking
+[/Q]
+
+[Q]
+id: AUT-025
+domain: 6
+type: SINGLE
+text:
+Which protocol is an example of a southbound API in an SDN architecture?
+options:
+A) OpenFlow
+B) A REST API used by an IT service management application
+C) HTTP used by a web browser to access the controller GUI
+D) SMTP
+answer: A
+explanation:
+OpenFlow (ONF) permette al controller di programmare direttamente le tabelle di inoltro degli switch: è un'API southbound. Altri esempi: NETCONF, RESTCONF, OpFlex (Cisco ACI), SSH/CLI. Le API usate dalle applicazioni verso il controller sono northbound.
+reference: Exam topic 6.2 - Controller-based networking
+[/Q]
+
+[Q]
+id: AUT-026
+domain: 6
+type: SINGLE
+text:
+Which Cisco Catalyst Center function uses telemetry and analytics to show network health and help troubleshoot client and device issues?
+options:
+A) Design
+B) Policy
+C) Provision
+D) Assurance
+answer: D
+explanation:
+Aree principali di Catalyst Center: Design (gerarchia dei siti, impostazioni di rete, immagini software), Policy (gruppi, segmentazione, QoS), Provision (distribuzione delle configurazioni ai dispositivi), Assurance (health score, telemetria, analisi dei problemi con AI/ML e azioni consigliate).
+reference: Exam topic 6.4 - Cisco Catalyst Center enabled device management
+[/Q]
+
+[Q]
+id: AUT-027
+domain: 6
+type: SINGLE
+text:
+What is intent-based networking (IBN)?
+options:
+A) A method of configuring each device manually through the CLI
+B) An approach in which administrators define desired business outcomes, the system translates them into network policies and continuously verifies that the network behaves as intended
+C) A routing protocol that selects paths based on application intent
+D) A wireless security standard
+answer: B
+explanation:
+IBN = ciclo continuo: intento (cosa si vuole ottenere) → traduzione in policy → attivazione automatica sui dispositivi → assurance (verifica continua e correzione). Cisco Catalyst Center e SD-Access ne sono le implementazioni Cisco nel campus.
+reference: Exam topic 6.4 - Catalyst Center enabled device management
+[/Q]
+
+[Q]
+id: AUT-028
+domain: 6
+type: SINGLE
+text:
+Which configuration management tool organizes its configuration code into recipes and cookbooks?
+options:
+A) Ansible
+B) Puppet
+C) Chef
+D) Terraform
+answer: C
+explanation:
+Chef: recipe e cookbook in Ruby, agent-based, modello pull. Puppet: manifest e module, agent-based, pull. Ansible: playbook in YAML, agentless, push. Terraform: file HCL dichiarativi per il provisioning dell'infrastruttura.
+reference: Exam topic 6.6 - Configuration management mechanisms
+[/Q]
+
+[Q]
+id: AUT-029
+domain: 6
+type: SINGLE
+text:
+In Ansible, what is the purpose of the inventory file?
+options:
+A) It defines the tasks to be executed.
+B) It lists the managed hosts and groups, with variables such as connection parameters.
+C) It stores the Python modules used by Ansible.
+D) It contains the log of all executed playbooks.
+answer: B
+explanation:
+L'inventory (formato INI o YAML) elenca host e gruppi (es. [switches], [routers]) e relative variabili. Il playbook definisce i play e i task da eseguire su quei gruppi; i moduli (es. cisco.ios.ios_config) eseguono le singole azioni.
+reference: Exam topic 6.6 - Ansible
+[/Q]
+
+[Q]
+id: AUT-030
+domain: 6
+type: SINGLE
+text:
+Which statement describes a push model for configuration management?
+options:
+A) Managed devices periodically contact a central server to download their configuration.
+B) A central control node connects to the managed devices and sends the configuration to them when a task is run.
+C) Devices exchange configuration with their neighbors through a routing protocol.
+D) Configuration is applied only through the console port.
+answer: B
+explanation:
+Push (Ansible): il nodo di controllo si collega ai dispositivi (SSH/API) e applica le modifiche quando l'amministratore lancia il playbook. Pull (Puppet, Chef): un agent sul dispositivo contatta periodicamente il server e scarica lo stato desiderato.
+reference: Exam topic 6.6 - Configuration management mechanisms
+[/Q]
+
+[Q]
+id: AUT-031
+domain: 6
+type: SINGLE
+text:
+Which Terraform command shows the changes that will be made to reach the desired state, without applying them?
+options:
+A) terraform init
+B) terraform plan
+C) terraform apply
+D) terraform destroy
+answer: B
+explanation:
+Flusso Terraform: init (scarica i provider) → plan (confronta lo stato desiderato con lo stato attuale e mostra le modifiche) → apply (esegue le modifiche e aggiorna il file di stato) → destroy (rimuove le risorse gestite).
+reference: Exam topic 6.6 - Ansible and Terraform
+[/Q]
+
+[Q]
+id: AUT-032
+domain: 6
+type: SINGLE
+text:
+Configuration management tools are often described as idempotent. What does this mean?
+options:
+A) They can only run once on each device.
+B) Running the same task multiple times produces the same end state; changes are made only if the device is not already in the desired state.
+C) They encrypt every configuration change.
+D) They require an agent on each device.
+answer: B
+explanation:
+Un'operazione idempotente porta il sistema allo stato desiderato e, se lo stato è già corretto, non fa nulla (Ansible riporta "ok" invece di "changed"). Questo rende sicuro rieseguire più volte gli stessi playbook o piani per correggere le derive di configurazione.
+reference: Exam topic 6.6 - Configuration management mechanisms
+[/Q]
+
+[Q]
+id: AUT-033
+domain: 6
+type: SINGLE
+text:
+A network engineer uses a generative AI assistant to produce an ACL configuration. What is the most appropriate practice?
+options:
+A) Paste the output directly into production devices because AI output is always correct.
+B) Review and validate the generated configuration, for example in a lab or with change control, before deploying it.
+C) Use AI only to generate passwords.
+D) Disable logging so the AI changes cannot be audited.
+answer: B
+explanation:
+L'AI generativa può accelerare il lavoro (bozze di configurazione, script, documentazione, spiegazione dei log), ma può produrre risultati plausibili e sbagliati ("allucinazioni"). Le configurazioni vanno verificate, testate e approvate; inoltre non bisogna inviare dati sensibili (password, topologie) a servizi esterni non autorizzati.
+reference: Exam topic 6.3 - Describe AI (generative and predictive) and machine learning in network operations
+[/Q]
+
+[Q]
+id: AUT-034
+domain: 6
+type: DRAG
+text:
+Match each data format to its characteristic syntax.
+items:
+JSON => Curly braces for objects, square brackets for arrays, key/value pairs
+XML => Opening and closing tags that enclose each element
+YAML => Indentation and dashes for list items, minimal punctuation
+targets: CSV
+explanation:
+JSON: {"vlan": 10}. XML: <vlan>10</vlan>. YAML: "vlan: 10" con l'indentazione per la gerarchia e "- " per gli elementi delle liste. Tutti e tre possono rappresentare la stessa struttura di dati.
+reference: Exam topic 6.7 - Data encoding formats
+[/Q]
+
+[Q]
+id: AUT-035
+domain: 6
+type: SINGLE
+text:
+What is the purpose of an API key when calling a REST API?
+options:
+A) It encrypts the HTTP payload end to end.
+B) It identifies and authenticates the calling application or user to the API.
+C) It specifies the version of the JSON format.
+D) It selects the HTTP method.
+answer: B
+explanation:
+Tipi di autenticazione per le REST API: Basic (utente e password in Base64, sempre su HTTPS), API key (stringa segreta in un header o nella query), token (bearer, spesso ottenuto con una prima chiamata di login), OAuth (accesso delegato con token a scadenza). La cifratura è fornita da TLS (HTTPS), non dalla chiave.
+reference: Exam topic 6.5 - REST-based APIs (authentication types)
+[/Q]

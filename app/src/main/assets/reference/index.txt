@@ -1,0 +1,13 @@
+# file|titolo mostrato nella lista
+exam_tips.html|Consigli per l'esame
+subnetting.html|Subnetting IPv4
+ipv6.html|IPv6
+ad_metrics.html|Routing: AD e longest match
+ospf.html|OSPFv2 single-area
+switching.html|VLAN, trunk e STP
+wireless.html|Wireless
+services.html|Servizi IP (NAT, DHCP, NTP, QoS...)
+ports.html|Porte e protocolli
+security.html|Sicurezza
+automation.html|Automazione e API
+ios_commands.html|Comandi IOS essenziali

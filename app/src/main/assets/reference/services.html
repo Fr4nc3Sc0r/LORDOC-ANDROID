@@ -1,0 +1,59 @@
+<html><body>
+<h1>Servizi IP</h1>
+<h2>NAT</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Termine</th><th>Significato</th></tr>
+<tr><td>Inside local</td><td>IP reale dell'host interno</td></tr>
+<tr><td>Inside global</td><td>IP con cui l'host interno appare all'esterno</td></tr>
+<tr><td>Outside global</td><td>IP reale dell'host esterno</td></tr>
+<tr><td>Outside local</td><td>IP dell'host esterno come appare all'interno</td></tr>
+</table>
+<pre>
+ip nat inside source static 10.1.1.10 203.0.113.10
+ip nat pool POOL 203.0.113.20 203.0.113.30 netmask 255.255.255.0
+ip nat inside source list 1 pool POOL
+ip nat inside source list 1 interface g0/0 overload   ! PAT
+interface g0/1 / ip nat inside    interface g0/0 / ip nat outside
+show ip nat translations / show ip nat statistics / clear ip nat translation *
+</pre>
+<h2>DHCP</h2>
+<p>DORA: Discover, Offer, Request, Ack · UDP 67 server / 68 client · relay: <code>ip helper-address</code></p>
+<pre>
+ip dhcp excluded-address 192.168.1.1 192.168.1.10
+ip dhcp pool LAN
+ network 192.168.1.0 255.255.255.0
+ default-router 192.168.1.1
+ dns-server 8.8.8.8
+ lease 7
+interface g0/0 / ip address dhcp      ! router come client DHCP
+</pre>
+<h2>NTP</h2>
+<p><code>ntp server 10.0.0.1</code> (client) · <code>ntp master 3</code> (sorgente autorevole) ·
+<code>show ntp status</code> / <code>show ntp associations</code> · UDP 123 · stratum basso = più affidabile.</p>
+<h2>DNS</h2>
+<p>UDP/TCP 53 · A, AAAA, CNAME, PTR, MX, NS · <code>ip name-server</code>, <code>ip domain-lookup</code></p>
+<h2>SNMP</h2>
+<p>Manager, agent, MIB, OID · Get/GetNext/GetBulk/Set · Trap (no ack) / Inform (con ack) · UDP 161/162 ·
+v3 = auth + priv.</p>
+<h2>Syslog</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Livello</th><th>Nome</th><th>Livello</th><th>Nome</th></tr>
+<tr><td>0</td><td>Emergency</td><td>4</td><td>Warning</td></tr>
+<tr><td>1</td><td>Alert</td><td>5</td><td>Notification</td></tr>
+<tr><td>2</td><td>Critical</td><td>6</td><td>Informational</td></tr>
+<tr><td>3</td><td>Error</td><td>7</td><td>Debugging</td></tr>
+</table>
+<p>"Every Awesome Cisco Engineer Will Need Ice cream Daily" · <code>logging host 10.0.0.50</code>,
+<code>logging trap warnings</code>, <code>logging console</code>, <code>terminal monitor</code> · UDP 514.</p>
+<h2>QoS</h2>
+<ul>
+<li>Classificazione e marcatura: CoS (802.1p, 3 bit L2), DSCP (6 bit L3). EF = 46 (voce), AF41 = 34, CS0 = 0.</li>
+<li>Trust boundary: il punto in cui ci si fida delle marcature (di solito il telefono IP o lo switch di accesso).</li>
+<li>Code: LLQ (priorità stretta) + CBWFQ (banda garantita).</li>
+<li>Congestion avoidance: WRED. Policing scarta/rimarca, shaping mette in buffer.</li>
+<li>Voce: one-way delay ≤ 150 ms, jitter ≤ 30 ms, perdita ≤ 1%.</li>
+</ul>
+<h2>Trasferimento file</h2>
+<p>TFTP UDP 69 (no auth) · FTP TCP 20/21 · SCP/SFTP su SSH TCP 22 ·
+<code>copy tftp: flash:</code>, <code>copy running-config tftp:</code></p>
+</body></html>

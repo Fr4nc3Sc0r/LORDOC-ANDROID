@@ -1,0 +1,4 @@
+// File di build principale: dichiara solo il plugin Android, applicato nel modulo :app.
+plugins {
+    id 'com.android.application' version '8.7.3' apply false
+}

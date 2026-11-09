@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.lordoc.android'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.lordoc.android'
+        minSdk 26          // Android 8.0: serve per java.nio.file (storico e statistiche)
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    lint {
+        abortOnError true
+        warningsAsErrors false
+    }
+}
+
+// L'app non ha dipendenze esterne: usa solo le API standard di Android e Java.
+// Le librerie qui sotto servono SOLO ai test automatici (non finiscono nell'APK).
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'androidx.test:core:1.6.1'
+}

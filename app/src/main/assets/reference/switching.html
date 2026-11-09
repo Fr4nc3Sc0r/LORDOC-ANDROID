@@ -1,0 +1,63 @@
+<html><body>
+<h1>VLAN, trunk, EtherChannel e STP</h1>
+<h2>VLAN</h2>
+<p>Normal range 1-1005 (1002-1005 riservate) · Extended range 1006-4094 · VLAN 1 di default non cancellabile.</p>
+<pre>
+vlan 10
+ name USERS
+interface g0/5
+ switchport mode access
+ switchport access vlan 10
+ switchport voice vlan 20
+</pre>
+<h2>Trunk 802.1Q</h2>
+<ul>
+<li>Tag di 4 byte (TPID 0x8100, PCP, DEI, VLAN ID 12 bit). Native VLAN non taggata.</li>
+<li><code>switchport trunk allowed vlan add 30</code> (senza "add" sostituisci la lista!)</li>
+<li>Best practice: native VLAN inutilizzata, <code>switchport nonegotiate</code>.</li>
+</ul>
+<h2>DTP</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>access</th><th>trunk</th><th>dynamic desirable</th><th>dynamic auto</th></tr>
+<tr><td>access</td><td>Access</td><td>mismatch</td><td>Access</td><td>Access</td></tr>
+<tr><td>trunk</td><td>mismatch</td><td>Trunk</td><td>Trunk</td><td>Trunk</td></tr>
+<tr><td>desirable</td><td>Access</td><td>Trunk</td><td>Trunk</td><td>Trunk</td></tr>
+<tr><td>auto</td><td>Access</td><td>Trunk</td><td>Trunk</td><td><b>Access</b></td></tr>
+</table>
+<h2>EtherChannel</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Protocollo</th><th>Modalità</th><th>Funziona con</th></tr>
+<tr><td>LACP (802.3ad)</td><td>active / passive</td><td>active-active, active-passive</td></tr>
+<tr><td>PAgP (Cisco)</td><td>desirable / auto</td><td>desirable-desirable, desirable-auto</td></tr>
+<tr><td>Statico</td><td>on</td><td>solo on-on</td></tr>
+</table>
+<p>Membri con stessa velocità, duplex, modalità e VLAN. Verifica: <code>show etherchannel summary</code>.</p>
+<h2>Spanning Tree (Rapid PVST+)</h2>
+<ol>
+<li>Elezione root bridge: Bridge ID più basso (priorità multipla di 4096 + VLAN ID, poi MAC).</li>
+<li>Root port su ogni non-root: costo verso il root più basso → BID del vicino più basso → port ID più basso.</li>
+<li>Designated port su ogni segmento; le altre diventano alternate/backup (discarding).</li>
+</ol>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Velocità</th><th>Costo short</th><th>Costo long</th></tr>
+<tr><td>10 Mbps</td><td>100</td><td>2.000.000</td></tr>
+<tr><td>100 Mbps</td><td>19</td><td>200.000</td></tr>
+<tr><td>1 Gbps</td><td>4</td><td>20.000</td></tr>
+<tr><td>10 Gbps</td><td>2</td><td>2.000</td></tr>
+</table>
+<p>Stati 802.1D: blocking, listening (15 s), learning (15 s), forwarding, disabled. RSTP: discarding, learning, forwarding.</p>
+<p>Timer 802.1D: hello 2 s, forward delay 15 s, max age 20 s.</p>
+<ul>
+<li><b>PortFast</b>: porta edge, va subito in forwarding (solo verso host).</li>
+<li><b>BPDU Guard</b>: err-disable se arriva una BPDU.</li>
+<li><b>Root Guard</b>: impedisce che un dispositivo sulla porta diventi root.</li>
+<li><code>spanning-tree vlan 10 root primary</code> / <code>priority 24576</code></li>
+</ul>
+<h2>CDP vs LLDP</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>CDP</th><th>LLDP</th></tr>
+<tr><td>Standard</td><td>Cisco</td><td>IEEE 802.1AB</td></tr>
+<tr><td>Default su IOS</td><td>attivo</td><td>spesso disattivo (<code>lldp run</code>)</td></tr>
+<tr><td>Timer / holdtime</td><td>60 / 180 s</td><td>30 / 120 s</td></tr>
+</table>
+</body></html>

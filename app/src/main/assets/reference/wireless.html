@@ -1,0 +1,46 @@
+<html><body>
+<h1>Wireless</h1>
+<h2>Standard 802.11</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Standard</th><th>Nome</th><th>Banda</th><th>Velocità max teorica</th></tr>
+<tr><td>802.11b</td><td></td><td>2,4 GHz</td><td>11 Mbps</td></tr>
+<tr><td>802.11a</td><td></td><td>5 GHz</td><td>54 Mbps</td></tr>
+<tr><td>802.11g</td><td></td><td>2,4 GHz</td><td>54 Mbps</td></tr>
+<tr><td>802.11n</td><td>Wi-Fi 4</td><td>2,4 / 5 GHz</td><td>600 Mbps</td></tr>
+<tr><td>802.11ac</td><td>Wi-Fi 5</td><td>5 GHz</td><td>~6,9 Gbps</td></tr>
+<tr><td>802.11ax</td><td>Wi-Fi 6 / 6E</td><td>2,4 / 5 / 6 GHz</td><td>~9,6 Gbps</td></tr>
+</table>
+<p>Canali 2,4 GHz non sovrapposti: <b>1, 6, 11</b>. La banda a 5 GHz ha molti più canali non sovrapposti.</p>
+<h2>Terminologia RF e topologie</h2>
+<ul>
+<li><b>SSID</b>: nome della rete · <b>BSSID</b>: MAC radio dell'AP</li>
+<li><b>BSS</b>: un AP e i suoi client · <b>ESS</b>: più BSS con lo stesso SSID (roaming) · <b>IBSS</b>: ad hoc</li>
+<li>Modalità aggiuntive: repeater, workgroup bridge, outdoor bridge, mesh</li>
+<li>Wi-Fi usa CSMA/CA (half-duplex, evita le collisioni anziché rilevarle)</li>
+</ul>
+<h2>Architetture</h2>
+<ul>
+<li><b>Autonomous</b>: AP gestiti singolarmente</li>
+<li><b>Lightweight (split-MAC)</b> + WLC: CAPWAP UDP 5246 (control, DTLS) e 5247 (data)</li>
+<li><b>Cloud-based</b>: gestione dal cloud (es. Meraki)</li>
+<li>Deployment WLC: unified (appliance), cloud, embedded (switch), Mobility Express (su AP)</li>
+</ul>
+<h2>Modalità AP</h2>
+<p>Local · FlexConnect · Monitor · Sniffer · Rogue detector · SE-Connect · Bridge/Mesh</p>
+<h2>Porte e interfacce del WLC</h2>
+<ul>
+<li>Porte: service port (OOB), distribution system port (dati, anche in LAG statico), console, redundancy</li>
+<li>Interfacce: management, virtual, dynamic (WLAN ↔ VLAN), service-port</li>
+<li>LAG sul WLC = EtherChannel <code>mode on</code> sullo switch (no LACP/PAgP)</li>
+</ul>
+<h2>Sicurezza</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>Autenticazione</th><th>Cifratura</th></tr>
+<tr><td>WEP</td><td>chiave condivisa</td><td>RC4 (insicuro)</td></tr>
+<tr><td>WPA</td><td>PSK / 802.1X</td><td>TKIP</td></tr>
+<tr><td>WPA2</td><td>PSK / 802.1X</td><td>AES-CCMP</td></tr>
+<tr><td>WPA3</td><td>SAE / 802.1X (Enterprise 192-bit)</td><td>AES-GCMP, PMF obbligatorio</td></tr>
+</table>
+<p class="tip">Configurare una WLAN WPA2-PSK dalla GUI del WLC è un tipico argomento d'esame (topic 5.10):
+WLAN → General (SSID, profile, status) → Security → Layer 2 (WPA2 + PSK) → QoS.</p>
+</body></html>

@@ -1,0 +1,46 @@
+<html><body>
+<h1>Routing: decisione di inoltro</h1>
+<h2>Ordine di scelta</h2>
+<ol>
+<li><b>Longest prefix match</b>: vince sempre la route più specifica.</li>
+<li>A parità di prefisso, vince l'<b>administrative distance</b> più bassa (fonti diverse).</li>
+<li>A parità di protocollo, vince la <b>metrica</b> più bassa (ECMP se uguali).</li>
+</ol>
+<h2>Administrative distance di default</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Fonte</th><th>AD</th></tr>
+<tr><td>Connected</td><td>0</td></tr>
+<tr><td>Static</td><td>1</td></tr>
+<tr><td>EIGRP summary</td><td>5</td></tr>
+<tr><td>eBGP</td><td>20</td></tr>
+<tr><td>EIGRP interno</td><td>90</td></tr>
+<tr><td>IGRP</td><td>100</td></tr>
+<tr><td>OSPF</td><td>110</td></tr>
+<tr><td>IS-IS</td><td>115</td></tr>
+<tr><td>RIP</td><td>120</td></tr>
+<tr><td>EIGRP esterno</td><td>170</td></tr>
+<tr><td>iBGP</td><td>200</td></tr>
+<tr><td>Unknown / non affidabile</td><td>255</td></tr>
+</table>
+<h2>Codici della tabella di routing</h2>
+<p>C connected · L local (/32 dell'interfaccia) · S static · S* default statica · O OSPF · O IA inter-area ·
+O E1/E2 esterne · D EIGRP · D EX EIGRP esterna · R RIP · B BGP</p>
+<h2>Route statiche</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Tipo</th><th>Esempio</th></tr>
+<tr><td>Network</td><td><code>ip route 10.2.0.0 255.255.0.0 10.0.0.2</code></td></tr>
+<tr><td>Host</td><td><code>ip route 10.2.2.2 255.255.255.255 10.0.0.2</code></td></tr>
+<tr><td>Default</td><td><code>ip route 0.0.0.0 0.0.0.0 203.0.113.1</code></td></tr>
+<tr><td>Floating</td><td><code>ip route 0.0.0.0 0.0.0.0 198.51.100.1 130</code></td></tr>
+<tr><td>IPv6 default</td><td><code>ipv6 route ::/0 2001:db8::1</code></td></tr>
+</table>
+<h2>FHRP</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th></th><th>HSRP</th><th>VRRP</th><th>GLBP</th></tr>
+<tr><td>Standard</td><td>Cisco</td><td>IETF</td><td>Cisco</td></tr>
+<tr><td>Ruoli</td><td>Active/Standby</td><td>Master/Backup</td><td>AVG/AVF</td></tr>
+<tr><td>MAC virtuale</td><td>0000.0C07.ACxx (v1)</td><td>0000.5E00.01xx</td><td>0007.B400.xxyy</td></tr>
+<tr><td>Preempt default</td><td>No</td><td>Sì</td><td>No (AVG)</td></tr>
+<tr><td>Load balancing</td><td>per gruppo</td><td>per gruppo</td><td>nativo</td></tr>
+</table>
+</body></html>

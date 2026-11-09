@@ -1,0 +1,52 @@
+<html><body>
+<h1>Subnetting IPv4</h1>
+<h2>Tabella dei prefissi</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Prefisso</th><th>Maschera</th><th>Wildcard</th><th>Block size</th><th>Host utilizzabili</th></tr>
+<tr><td>/16</td><td>255.255.0.0</td><td>0.0.255.255</td><td>1 (3° ottetto)</td><td>65.534</td></tr>
+<tr><td>/17</td><td>255.255.128.0</td><td>0.0.127.255</td><td>128 (3°)</td><td>32.766</td></tr>
+<tr><td>/18</td><td>255.255.192.0</td><td>0.0.63.255</td><td>64 (3°)</td><td>16.382</td></tr>
+<tr><td>/19</td><td>255.255.224.0</td><td>0.0.31.255</td><td>32 (3°)</td><td>8.190</td></tr>
+<tr><td>/20</td><td>255.255.240.0</td><td>0.0.15.255</td><td>16 (3°)</td><td>4.094</td></tr>
+<tr><td>/21</td><td>255.255.248.0</td><td>0.0.7.255</td><td>8 (3°)</td><td>2.046</td></tr>
+<tr><td>/22</td><td>255.255.252.0</td><td>0.0.3.255</td><td>4 (3°)</td><td>1.022</td></tr>
+<tr><td>/23</td><td>255.255.254.0</td><td>0.0.1.255</td><td>2 (3°)</td><td>510</td></tr>
+<tr><td>/24</td><td>255.255.255.0</td><td>0.0.0.255</td><td>1 (3°) / 256</td><td>254</td></tr>
+<tr><td>/25</td><td>255.255.255.128</td><td>0.0.0.127</td><td>128</td><td>126</td></tr>
+<tr><td>/26</td><td>255.255.255.192</td><td>0.0.0.63</td><td>64</td><td>62</td></tr>
+<tr><td>/27</td><td>255.255.255.224</td><td>0.0.0.31</td><td>32</td><td>30</td></tr>
+<tr><td>/28</td><td>255.255.255.240</td><td>0.0.0.15</td><td>16</td><td>14</td></tr>
+<tr><td>/29</td><td>255.255.255.248</td><td>0.0.0.7</td><td>8</td><td>6</td></tr>
+<tr><td>/30</td><td>255.255.255.252</td><td>0.0.0.3</td><td>4</td><td>2</td></tr>
+<tr><td>/31</td><td>255.255.255.254</td><td>0.0.0.1</td><td>2</td><td>2 (punto-punto, RFC 3021)</td></tr>
+<tr><td>/32</td><td>255.255.255.255</td><td>0.0.0.0</td><td>1</td><td>1 (host route / loopback)</td></tr>
+</table>
+<h2>Metodo del magic number</h2>
+<ol>
+<li>Trova l'<b>ottetto interessante</b>: quello in cui la maschera non è né 255 né 0.</li>
+<li>Block size = <b>256 - valore della maschera</b> in quell'ottetto.</li>
+<li>Le subnet iniziano dai multipli del block size: 0, B, 2B, 3B...</li>
+<li>La rete dell'host è il multiplo immediatamente inferiore o uguale al suo valore.</li>
+<li>Broadcast = subnet successiva - 1. Host: da rete+1 a broadcast-1.</li>
+</ol>
+<p><b>Esempio</b>: 172.16.45.130/27 → maschera .224 → block 32 → subnet .128 (128-159)
+→ rete 172.16.45.128, broadcast 172.16.45.159, host .129-.158.</p>
+<h2>Formule</h2>
+<ul>
+<li>Numero di subnet = 2<sup>bit presi in prestito</sup></li>
+<li>Host per subnet = 2<sup>bit di host</sup> - 2</li>
+<li>Potenze di 2: 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096</li>
+</ul>
+<h2>Indirizzi speciali</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Range</th><th>Uso</th></tr>
+<tr><td>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</td><td>Privati (RFC 1918)</td></tr>
+<tr><td>127.0.0.0/8</td><td>Loopback</td></tr>
+<tr><td>169.254.0.0/16</td><td>APIPA / link-local (DHCP non raggiungibile)</td></tr>
+<tr><td>100.64.0.0/10</td><td>Shared address space (CGNAT)</td></tr>
+<tr><td>224.0.0.0/4</td><td>Multicast (classe D)</td></tr>
+<tr><td>192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24</td><td>Documentazione</td></tr>
+</table>
+<h2>Classi (storiche)</h2>
+<p>A: 1-126 (/8) · B: 128-191 (/16) · C: 192-223 (/24) · D: 224-239 multicast · E: 240-255 sperimentale</p>
+</body></html>

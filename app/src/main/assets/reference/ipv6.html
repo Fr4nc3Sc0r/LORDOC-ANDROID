@@ -1,0 +1,33 @@
+<html><body>
+<h1>IPv6</h1>
+<h2>Tipi di indirizzo</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Prefisso</th><th>Tipo</th><th>Note</th></tr>
+<tr><td>2000::/3</td><td>Global unicast</td><td>instradabili su Internet</td></tr>
+<tr><td>FC00::/7 (FD00::/8)</td><td>Unique local</td><td>equivalente dei privati IPv4</td></tr>
+<tr><td>FE80::/10</td><td>Link-local</td><td>automatici, usati come next-hop dai protocolli di routing</td></tr>
+<tr><td>FF00::/8</td><td>Multicast</td><td>FF02::1 tutti i nodi, FF02::2 tutti i router, FF02::5/6 OSPF, FF02::A EIGRP</td></tr>
+<tr><td>FF02::1:FFxx:xxxx</td><td>Solicited-node multicast</td><td>usato da NDP al posto dell'ARP</td></tr>
+<tr><td>::1/128</td><td>Loopback</td><td></td></tr>
+<tr><td>::/128</td><td>Unspecified</td><td>sorgente prima di avere un indirizzo</td></tr>
+<tr><td>2001:DB8::/32</td><td>Documentazione</td><td></td></tr>
+</table>
+<h2>Regole di compressione</h2>
+<ul>
+<li>Togli gli zeri <b>iniziali</b> di ogni hextet (0DB8 → DB8), mai quelli finali.</li>
+<li>Sostituisci <b>una sola</b> sequenza di hextet a zero con <code>::</code> (la più lunga).</li>
+</ul>
+<h2>EUI-64</h2>
+<p>MAC 0011.2233.4455 → 0011:22<b>FF:FE</b>33:4455 → inverti il 7° bit → <b>02</b>11:22FF:FE33:4455</p>
+<h2>Assegnazione degli indirizzi</h2>
+<table border="0" cellspacing="0" width="100%">
+<tr><th>Metodo</th><th>Descrizione</th></tr>
+<tr><td>Statico</td><td><code>ipv6 address 2001:db8:1::1/64</code></td></tr>
+<tr><td>SLAAC</td><td>prefisso dal Router Advertisement + interface ID (EUI-64 o casuale)</td></tr>
+<tr><td>DHCPv6 stateless</td><td>SLAAC per l'indirizzo, DHCPv6 per DNS e altre opzioni</td></tr>
+<tr><td>DHCPv6 stateful</td><td>indirizzo e opzioni dal server DHCPv6</td></tr>
+</table>
+<h2>NDP (ICMPv6)</h2>
+<p>RS (133) e RA (134) tra host e router · NS (135) e NA (136) per risolvere indirizzi (sostituiscono ARP) e DAD.</p>
+<p class="tip">Per instradare IPv6 su un router Cisco serve <code>ipv6 unicast-routing</code>.</p>
+</body></html>

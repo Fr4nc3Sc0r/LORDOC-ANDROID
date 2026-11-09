@@ -1,0 +1,799 @@
+# =====================================================================
+# Dominio 5.0 - Security Fundamentals (15%)
+# =====================================================================
+
+[Q]
+id: SEC-001
+domain: 5
+type: SINGLE
+text:
+According to Cisco best practices, where should a standard IPv4 ACL be placed?
+options:
+A) As close to the source as possible
+B) As close to the destination as possible
+C) On the Internet edge only
+D) On every interface in the path
+answer: B
+explanation:
+Le ACL standard filtrano solo per IP sorgente: se messe vicino alla sorgente bloccherebbero quel traffico verso TUTTE le destinazioni. Vanno quindi vicino alla destinazione.
+Le ACL estese (sorgente, destinazione, protocollo, porte) vanno vicino alla sorgente per scartare il traffico indesiderato il prima possibile.
+reference: Exam topic 5.6 - Configure and verify access control lists
+[/Q]
+
+[Q]
+id: SEC-002
+domain: 5
+type: SINGLE
+text:
+Refer to the exhibit. The ACL is applied inbound on the router interface connected to the 192.168.10.0/24 LAN. What is the result?
+exhibit:
+ip access-list extended WEB
+ 10 permit tcp 192.168.10.0 0.0.0.255 host 10.0.0.5 eq 443
+ 20 deny ip 192.168.10.0 0.0.0.255 host 10.0.0.5
+!
+interface GigabitEthernet0/1
+ ip address 192.168.10.1 255.255.255.0
+ ip access-group WEB in
+options:
+A) LAN hosts can reach 10.0.0.5 using HTTPS and can reach all other destinations.
+B) LAN hosts can reach 10.0.0.5 only using HTTPS, and all other traffic from the LAN is denied.
+C) LAN hosts can ping 10.0.0.5 but cannot use HTTPS.
+D) All traffic from the LAN is permitted because the deny statement comes last.
+answer: B
+explanation:
+Le ACL sono elaborate dall'alto in basso e si fermano alla prima corrispondenza. La riga 10 permette HTTPS verso 10.0.0.5, la riga 20 nega il resto verso 10.0.0.5, e alla fine c'è sempre un "deny any" implicito: TUTTO il resto del traffico (es. Internet) viene scartato.
+Per permettere il resto servirebbe "30 permit ip any any".
+reference: Exam topic 5.6 - Access control lists (implicit deny)
+[/Q]
+
+[Q]
+id: SEC-003
+domain: 5
+type: FILL
+text:
+What wildcard mask matches all addresses in the 172.16.32.0/20 network? (Enter in dotted-decimal format.)
+answer: 0.0.15.255
+explanation:
+Wildcard = 255.255.255.255 - subnet mask. /20 = 255.255.240.0 → 255.255.255.255 - 255.255.240.0 = 0.0.15.255.
+Nella wildcard, 0 = "il bit deve corrispondere", 1 = "bit indifferente". Casi speciali: "host 10.1.1.1" = 10.1.1.1 0.0.0.0; "any" = 0.0.0.0 255.255.255.255.
+reference: Exam topic 5.6 - ACL wildcard masks
+[/Q]
+
+[Q]
+id: SEC-004
+domain: 5
+type: SINGLE
+text:
+Which port security violation mode drops frames from unknown MAC addresses, increments the violation counter, and generates a syslog message, but keeps the port up?
+options:
+A) protect
+B) restrict
+C) shutdown
+D) shutdown vlan
+answer: B
+explanation:
+- protect: scarta, nessun log, nessun incremento contatore
+- restrict: scarta, invia log/SNMP trap e incrementa il contatore; la porta resta up
+- shutdown (default): la porta va in err-disabled
+Comandi: "switchport port-security", "switchport port-security maximum 2", "switchport port-security mac-address sticky", "switchport port-security violation restrict". La porta deve essere access o trunk statico (non dynamic).
+reference: Exam topic 5.7 - Configure and verify Layer 2 security features (port security)
+[/Q]
+
+[Q]
+id: SEC-005
+domain: 5
+type: SINGLE
+text:
+With DHCP snooping enabled, which switch ports should be configured as trusted?
+options:
+A) All access ports connected to end users
+B) Ports that lead toward legitimate DHCP servers, such as uplinks
+C) Only ports in the native VLAN
+D) No ports; DHCP snooping trusts all ports by default
+answer: B
+explanation:
+Con DHCP snooping tutte le porte sono untrusted di default: su queste lo switch scarta i messaggi da server (OFFER, ACK, NAK), bloccando i DHCP server rogue. Si mettono "ip dhcp snooping trust" solo le porte verso i server legittimi (uplink).
+Lo snooping costruisce la binding table (MAC, IP, VLAN, porta), riusata da Dynamic ARP Inspection e IP Source Guard.
+reference: Exam topic 5.7 - DHCP snooping
+[/Q]
+
+[Q]
+id: SEC-006
+domain: 5
+type: SINGLE
+text:
+Which information does Dynamic ARP Inspection (DAI) use to validate ARP packets received on untrusted ports?
+options:
+A) The CDP neighbor table
+B) The DHCP snooping binding table
+C) The routing table
+D) The NAT translation table
+answer: B
+explanation:
+DAI intercetta i pacchetti ARP sulle porte untrusted e verifica che la coppia IP-MAC corrisponda a una entry della binding table DHCP snooping (o a ARP ACL statiche per host con IP statico). Previene ARP spoofing/poisoning e quindi attacchi man-in-the-middle.
+reference: Exam topic 5.7 - Dynamic ARP inspection
+[/Q]
+
+[Q]
+id: SEC-007
+domain: 5
+type: MULTI
+text:
+Which two statements about TACACS+ are true?
+options:
+A) It uses TCP port 49.
+B) It encrypts only the password in the access-request packet.
+C) It encrypts the entire body of the packet.
+D) It combines authentication and authorization in one process.
+E) It uses UDP ports 1812 and 1813.
+answer: A, C
+explanation:
+TACACS+ (Cisco): TCP 49, cifra l'intero payload, separa authentication, authorization e accounting (ideale per l'amministrazione dei dispositivi e l'autorizzazione dei singoli comandi).
+RADIUS (standard): UDP 1812/1813 (o 1645/1646), cifra solo la password, combina authentication e authorization; usato per l'accesso alla rete (802.1X, VPN).
+reference: Exam topic 5.8 - Compare authentication, authorization, and accounting concepts
+[/Q]
+
+[Q]
+id: SEC-008
+domain: 5
+type: SINGLE
+text:
+Which WPA3 feature replaces the Pre-Shared Key (PSK) exchange to protect against offline dictionary attacks?
+options:
+A) TKIP
+B) Simultaneous Authentication of Equals (SAE)
+C) WEP
+D) 802.1X with EAP-TLS
+answer: B
+explanation:
+WPA3-Personal usa SAE (Dragonfly handshake) al posto della PSK di WPA2: anche catturando l'handshake non si può fare un attacco a dizionario offline, e offre forward secrecy. WPA3 usa GCMP/AES, rende obbligatorio PMF (Protected Management Frames).
+Evoluzione: WEP (RC4, rotto) → WPA (TKIP) → WPA2 (AES-CCMP) → WPA3 (SAE, GCMP).
+reference: Exam topic 5.9 - Describe wireless security protocols (WPA, WPA2, and WPA3)
+[/Q]
+
+[Q]
+id: SEC-009
+domain: 5
+type: DRAG
+text:
+Match each security term to its definition.
+items:
+A weakness in a system that can be exploited => Vulnerability
+A mechanism or code used to take advantage of a weakness => Exploit
+A potential danger to an asset, such as an attacker or malware => Threat
+A countermeasure that reduces risk => Mitigation
+explanation:
+Concetti chiave: vulnerability (debolezza), exploit (il modo di sfruttarla), threat (il pericolo potenziale/l'attore), mitigation (la contromisura). Il rischio è la probabilità che una minaccia sfrutti una vulnerabilità moltiplicata per l'impatto.
+reference: Exam topic 5.1 - Define key security concepts (threats, vulnerabilities, exploits, and mitigation techniques)
+[/Q]
+
+[Q]
+id: SEC-010
+domain: 5
+type: DRAG
+text:
+Match each social engineering attack to its description.
+items:
+Fraudulent email targeted at a specific person or group => Spear phishing
+Phishing aimed at high-profile executives => Whaling
+Phishing conducted through voice phone calls => Vishing
+Phishing conducted through SMS text messages => Smishing
+targets: Pharming
+explanation:
+Varianti di phishing: spear phishing (mirato), whaling (dirigenti), vishing (voce), smishing (SMS). Il pharming invece reindirizza l'utente verso un sito falso manipolando DNS o file hosts. Mitigazione principale: programmi di security awareness e formazione degli utenti.
+reference: Exam topic 5.2 - Describe security program elements (user awareness, training)
+[/Q]
+
+[Q]
+id: SEC-011
+domain: 5
+type: SINGLE
+text:
+Which example represents multifactor authentication?
+options:
+A) A username and a password
+B) A password and a security question
+C) A password and a one-time code generated by a smartphone app
+D) Two different passwords
+answer: C
+explanation:
+MFA richiede fattori di categorie DIVERSE: qualcosa che sai (password, PIN), qualcosa che hai (token, smartphone, smart card), qualcosa che sei (biometria). Password + domanda di sicurezza sono entrambi "qualcosa che sai": è un solo fattore.
+reference: Exam topic 5.3 - Configure and verify device access control using local passwords / 5.4 MFA
+[/Q]
+
+[Q]
+id: SEC-012
+domain: 5
+type: SINGLE
+text:
+Which statement about "enable secret" compared to "enable password" is true?
+options:
+A) "enable password" is stored with a strong hash by default.
+B) "enable secret" is stored as a hash and takes precedence if both are configured.
+C) "service password-encryption" provides strong encryption equivalent to "enable secret".
+D) Both commands are ignored if a console password is configured.
+answer: B
+explanation:
+"enable secret" salva l'hash (MD5 type 5, oppure type 8/9 = SHA-256/scrypt sulle versioni recenti) e ha la precedenza su "enable password". "service password-encryption" applica solo il type 7, facilmente reversibile: nasconde le password a chi guarda lo schermo, ma non è sicurezza vera.
+reference: Exam topic 5.3 - Device access control using local passwords
+[/Q]
+
+[Q]
+id: SEC-013
+domain: 5
+type: DRAG
+text:
+Match each IEEE 802.1X component to its role.
+items:
+End device that requests network access => Supplicant
+Switch or WLC that controls the port and relays credentials => Authenticator
+RADIUS server that validates the credentials => Authentication server
+targets: Accounting proxy
+explanation:
+802.1X (port-based network access control): il supplicant (client) parla EAPoL con l'authenticator (switch/AP/WLC), che inoltra le credenziali via RADIUS all'authentication server (es. Cisco ISE). Finché l'autenticazione non riesce, la porta lascia passare solo traffico EAPoL.
+reference: Exam topic 5.8 / 5.9 - AAA and 802.1X
+[/Q]
+
+[Q]
+id: SEC-014
+domain: 5
+type: SINGLE
+text:
+Which type of VPN is typically used by individual teleworkers who run client software (or a browser) to connect securely to the corporate network?
+options:
+A) Site-to-site IPsec VPN
+B) Remote-access VPN
+C) GRE tunnel without encryption
+D) DMVPN hub-to-hub
+answer: B
+explanation:
+Remote-access VPN: un singolo utente si connette con un client (es. Cisco Secure Client/AnyConnect) usando TLS o IPsec. Site-to-site VPN: collega intere reti tramite gateway (router/firewall) con IPsec; gli host non sanno dell'esistenza del tunnel. GRE da solo non cifra.
+reference: Exam topic 5.5 - Describe IPsec remote access and site-to-site VPNs
+[/Q]
+
+[Q]
+id: SEC-015
+domain: 5
+type: SINGLE
+text:
+Refer to the exhibit. Which statement about remote access to the router is true?
+exhibit:
+username admin privilege 15 secret Str0ngP@ss
+!
+line vty 0 4
+ login local
+ transport input ssh
+ exec-timeout 5 0
+options:
+A) Telnet and SSH sessions are both allowed.
+B) Only SSH sessions are allowed, authenticated with the local username database.
+C) Users must enter the line password before the username.
+D) Sessions never time out.
+answer: B
+explanation:
+"login local" usa il database locale degli utenti (username/secret); "transport input ssh" accetta solo SSH (Telnet trasmette in chiaro). "exec-timeout 5 0" chiude le sessioni inattive dopo 5 minuti. Per limitare anche gli IP sorgente si può applicare un'ACL con "access-class X in" sulle line vty.
+reference: Exam topic 5.3 / 4.8 - Device access control and SSH
+[/Q]
+
+# ---------------------------------------------------------------------
+# Espansione banca dati - Security Fundamentals
+# ---------------------------------------------------------------------
+
+[Q]
+id: SEC-016
+domain: 5
+type: SINGLE
+text:
+Refer to the exhibit. ACL 10 is applied outbound on a router interface. What is the effect?
+exhibit:
+access-list 10 permit any
+access-list 10 deny 192.168.1.0 0.0.0.255
+options:
+A) Traffic from 192.168.1.0/24 is denied and all other traffic is permitted.
+B) All traffic is permitted because the first statement matches every packet.
+C) All traffic is denied because of the implicit deny.
+D) Only traffic from 192.168.1.0/24 is permitted.
+answer: B
+explanation:
+L'elaborazione si ferma alla prima corrispondenza: "permit any" corrisponde a tutti i pacchetti, quindi la riga deny non viene mai valutata. Regola: le voci più specifiche vanno sempre prima di quelle generiche. Le versioni recenti di IOS possono addirittura rifiutare la seconda riga perché già coperta dalla prima ("% Access rule can't be configured at higher sequence num as it is part of the existing rule").
+reference: Exam topic 5.6 - Configure and verify access control lists
+[/Q]
+
+[Q]
+id: SEC-017
+domain: 5
+type: SINGLE
+text:
+A named extended ACL has entries with sequence numbers 10 and 20. How can an engineer insert a new entry between them without rewriting the ACL?
+options:
+A) Delete the ACL and recreate it in the correct order.
+B) In named ACL configuration mode, enter the new entry with sequence number 15.
+C) Use the "insert before 20" command.
+D) Entries are always appended to the end and cannot be inserted.
+answer: B
+explanation:
+Le ACL con nome (e anche quelle numerate, se modificate in modalità "ip access-list") supportano i numeri di sequenza: "15 permit tcp ..." inserisce la voce tra la 10 e la 20, "no 20" elimina la riga 20. "ip access-list resequence" rinumera le voci.
+reference: Exam topic 5.6 - Access control lists
+[/Q]
+
+[Q]
+id: SEC-018
+domain: 5
+type: SINGLE
+text:
+Which ACE denies Telnet traffic from the 10.1.1.0/24 network to server 10.2.2.2?
+options:
+A) access-list 110 deny tcp 10.1.1.0 0.0.0.255 host 10.2.2.2 eq 22
+B) access-list 110 deny udp 10.1.1.0 0.0.0.255 host 10.2.2.2 eq 23
+C) access-list 110 deny tcp host 10.2.2.2 10.1.1.0 0.0.0.255 eq 23
+D) access-list 110 deny tcp 10.1.1.0 0.0.0.255 host 10.2.2.2 eq 23
+answer: D
+explanation:
+Ordine nelle ACL estese: azione, protocollo, sorgente, destinazione, porta. Telnet = TCP 23. Le opzioni errate usano la porta 22 (SSH), il protocollo UDP oppure invertono sorgente e destinazione. Ricorda di aggiungere un permit successivo, altrimenti il deny implicito blocca tutto il resto.
+reference: Exam topic 5.6 - Extended ACLs
+[/Q]
+
+[Q]
+id: SEC-019
+domain: 5
+type: SINGLE
+text:
+Which command applies standard ACL 5 to restrict which source addresses can open SSH sessions to the router?
+options:
+A) ip access-group 5 in (under line vty 0 4)
+B) access-class 5 in (under line vty 0 4)
+C) ip access-group 5 in (under an interface)
+D) transport input 5
+answer: B
+explanation:
+Sulle linee VTY si usa "access-class <ACL> in", che filtra le connessioni di gestione dirette al router indipendentemente dall'interfaccia di ingresso. "ip access-group" si applica alle interfacce e filtra il traffico in transito.
+reference: Exam topic 5.3 / 5.6 - Device access control and ACLs
+[/Q]
+
+[Q]
+id: SEC-020
+domain: 5
+type: FILL
+text:
+What wildcard mask matches every address in a /27 subnet? (Enter in dotted-decimal format.)
+answer: 0.0.0.31
+explanation:
+/27 = 255.255.255.224 → wildcard 0.0.0.31 (255 - 224 = 31). Scorciatoia: la wildcard di una subnet è sempre block size - 1 nell'ottetto interessante (32 - 1 = 31).
+reference: Exam topic 5.6 - ACL wildcard masks
+[/Q]
+
+[Q]
+id: SEC-021
+domain: 5
+type: SINGLE
+text:
+Which range of addresses is matched by "access-list 1 permit 192.168.4.0 0.0.3.255"?
+options:
+A) 192.168.4.0 - 192.168.4.255
+B) 192.168.4.0 - 192.168.7.255
+C) 192.168.0.0 - 192.168.3.255
+D) 192.168.4.0 - 192.168.8.255
+answer: B
+explanation:
+La wildcard 0.0.3.255 corrisponde a una maschera /22 (blocco di 4 nel terzo ottetto). Partendo da 192.168.4.0, l'intervallo va da .4.0 a .7.255. Le wildcard sono un modo compatto di riassumere più subnet contigue.
+reference: Exam topic 5.6 - ACL wildcard masks
+[/Q]
+
+[Q]
+id: SEC-022
+domain: 5
+type: SINGLE
+text:
+When is an inbound ACL processed on a router interface?
+options:
+A) After the routing decision, before the packet is sent out the interface
+B) As the packet arrives on the interface, before the routing decision
+C) Only for traffic generated by the router itself
+D) Only after NAT translation has occurred on the outside interface
+answer: B
+explanation:
+Un'ACL inbound viene valutata all'ingresso, prima del lookup di routing: i pacchetti scartati non consumano risorse di routing. Un'ACL outbound viene applicata dopo il routing, prima dell'invio. Le ACL outbound non filtrano il traffico generato dal router stesso.
+reference: Exam topic 5.6 - Access control lists
+[/Q]
+
+[Q]
+id: SEC-023
+domain: 5
+type: SINGLE
+text:
+What is the effect of the "switchport port-security mac-address sticky" command?
+options:
+A) It allows unlimited MAC addresses on the port.
+B) It dynamically learns MAC addresses and adds them to the running configuration as secure addresses.
+C) It prevents the port from learning any MAC addresses.
+D) It saves learned addresses directly to the startup configuration.
+answer: B
+explanation:
+Con sticky lo switch apprende i MAC dinamicamente (fino al massimo consentito) e li scrive nella running-config come "switchport port-security mac-address sticky <MAC>". Per non perderli al riavvio bisogna salvare la configurazione.
+reference: Exam topic 5.7 - Port security
+[/Q]
+
+[Q]
+id: SEC-024
+domain: 5
+type: SINGLE
+text:
+Refer to the exhibit. Which statement about interface Fa0/3 is true?
+exhibit:
+SW1#show port-security interface FastEthernet0/3
+Port Security              : Enabled
+Port Status                : Secure-shutdown
+Violation Mode             : Shutdown
+Aging Time                 : 0 mins
+Maximum MAC Addresses      : 1
+Total MAC Addresses        : 1
+Sticky MAC Addresses       : 0
+Last Source Address:Vlan   : 0050.7966.6801:10
+Security Violation Count   : 1
+options:
+A) The port is forwarding traffic only from MAC 0050.7966.6801.
+B) The port is err-disabled; it can be restored with "shutdown" followed by "no shutdown" after removing the cause.
+C) The port drops traffic from unknown MACs but stays up.
+D) The port has learned two sticky MAC addresses.
+answer: B
+explanation:
+"Secure-shutdown" con modalità Shutdown e un contatore di violazioni a 1: la porta è in err-disabled perché è comparso un secondo MAC (0050.7966.6801) oltre al massimo di 1. Si ripristina con "shutdown" / "no shutdown" oppure con "errdisable recovery cause psecure-violation".
+reference: Exam topic 5.7 - Port security
+[/Q]
+
+[Q]
+id: SEC-025
+domain: 5
+type: SINGLE
+text:
+An attacker sends thousands of DHCPDISCOVER messages with spoofed MAC addresses to exhaust the DHCP pool. What is this attack called?
+options:
+A) DHCP spoofing
+B) DHCP starvation
+C) ARP poisoning
+D) MAC flooding
+answer: B
+explanation:
+DHCP starvation esaurisce il pool, così i client legittimi non ottengono un indirizzo. Spesso è seguito da DHCP spoofing (server rogue che assegna un gateway controllato dall'attaccante). Mitigazioni: port security (limite di MAC), DHCP snooping con "ip dhcp snooping limit rate".
+reference: Exam topic 5.1 / 5.7 - Threats and Layer 2 security
+[/Q]
+
+[Q]
+id: SEC-026
+domain: 5
+type: SINGLE
+text:
+What is the result of a successful MAC flooding attack against a switch?
+options:
+A) The switch reboots.
+B) The MAC address table fills up, so the switch floods frames out all ports, allowing the attacker to capture traffic.
+C) All ports move to the err-disabled state.
+D) The switch stops responding to ARP.
+answer: B
+explanation:
+L'attaccante invia frame con migliaia di MAC sorgente falsi: la tabella CAM si riempie e lo switch tratta il traffico verso MAC nuovi come unknown unicast, inviandolo su tutte le porte della VLAN, come un hub. Mitigazione: port security, che limita il numero di MAC per porta.
+reference: Exam topic 5.7 - Layer 2 security features
+[/Q]
+
+[Q]
+id: SEC-027
+domain: 5
+type: SINGLE
+text:
+Which measure mitigates VLAN hopping attacks that use double 802.1Q tagging?
+options:
+A) Enable DTP on all access ports.
+B) Set the native VLAN of trunks to an unused VLAN that is not assigned to any access port.
+C) Use VLAN 1 for all user traffic.
+D) Enable PortFast on trunk ports.
+answer: B
+explanation:
+Il double tagging funziona se la VLAN di accesso dell'attaccante coincide con la native VLAN del trunk: il primo tag viene rimosso e il frame prosegue con il secondo tag nella VLAN vittima. Contromisure: native VLAN inutilizzata (o "vlan dot1q tag native"), DTP disabilitato ("switchport mode access" e "switchport nonegotiate"), porte inutilizzate spente.
+reference: Exam topic 5.7 - Layer 2 security features
+[/Q]
+
+[Q]
+id: SEC-028
+domain: 5
+type: SINGLE
+text:
+Which pair of commands enables DHCP snooping for VLAN 10?
+options:
+A) ip dhcp snooping (global) and ip dhcp snooping vlan 10 (global)
+B) ip dhcp snooping trust (interface) only
+C) dhcp snooping enable vlan 10 (interface)
+D) ip dhcp guard vlan 10 (global)
+answer: A
+explanation:
+DHCP snooping richiede l'abilitazione globale ("ip dhcp snooping") e per le singole VLAN ("ip dhcp snooping vlan 10"). Poi si configura "ip dhcp snooping trust" sulle porte verso il server legittimo. Attenzione: di default lo switch inserisce l'option 82, che alcuni server rifiutano ("no ip dhcp snooping information option").
+reference: Exam topic 5.7 - DHCP snooping
+[/Q]
+
+[Q]
+id: SEC-029
+domain: 5
+type: SINGLE
+text:
+Dynamic ARP Inspection is enabled on VLAN 10. Which interfaces should normally be configured with "ip arp inspection trust"?
+options:
+A) All access ports connected to end users
+B) Uplinks to other switches and routers
+C) Only the port connected to the DHCP server
+D) No interfaces; DAI trusts all ports by default
+answer: B
+explanation:
+Con DAI tutte le porte sono untrusted di default e gli ARP vengono confrontati con la binding table DHCP snooping. Le porte verso altri switch e router (che non hanno binding locali) vanno rese trusted, altrimenti il loro traffico ARP legittimo verrebbe scartato.
+reference: Exam topic 5.7 - Dynamic ARP inspection
+[/Q]
+
+[Q]
+id: SEC-030
+domain: 5
+type: SINGLE
+text:
+Which command must be entered first to enable AAA features such as RADIUS or TACACS+ authentication on a Cisco IOS device?
+options:
+A) aaa enable
+B) aaa new-model
+C) radius-server enable
+D) login authentication aaa
+answer: B
+explanation:
+"aaa new-model" abilita il framework AAA; poi si definiscono i server (es. "tacacs server ...", "radius server ...") e le method list, ad esempio "aaa authentication login default group tacacs+ local". Attenzione: dopo "aaa new-model" le linee VTY usano subito l'autenticazione AAA (locale di default).
+reference: Exam topic 5.8 - Compare authentication, authorization, and accounting concepts
+[/Q]
+
+[Q]
+id: SEC-031
+domain: 5
+type: DRAG
+text:
+Match each AAA function to its description.
+items:
+Verifies the identity of the user => Authentication
+Determines which resources and commands the user can access => Authorization
+Records what the user did and when => Accounting
+targets: Auditing
+explanation:
+Authentication = chi sei; Authorization = cosa puoi fare; Accounting = cosa hai fatto (log delle sessioni e dei comandi, utile per audit e fatturazione).
+reference: Exam topic 5.8 - AAA concepts
+[/Q]
+
+[Q]
+id: SEC-032
+domain: 5
+type: SINGLE
+text:
+A router is configured with "aaa authentication login default group tacacs+ local". When is the local user database used?
+options:
+A) Always, before contacting the TACACS+ server
+B) Only when the TACACS+ server is unreachable (it returns an error, not a rejection)
+C) When the TACACS+ server rejects the credentials
+D) Never; the keyword "local" is ignored
+answer: B
+explanation:
+I metodi di una method list vengono provati in ordine. Si passa al successivo solo se il precedente non risponde (errore); se il server TACACS+ risponde "fail" (credenziali errate), l'accesso viene negato senza provare il database locale. Il fallback "local" garantisce l'accesso di emergenza se il server è irraggiungibile.
+reference: Exam topic 5.8 - AAA
+[/Q]
+
+[Q]
+id: SEC-033
+domain: 5
+type: SINGLE
+text:
+What is the main difference between WPA2-Personal and WPA2-Enterprise?
+options:
+A) WPA2-Personal uses AES and WPA2-Enterprise uses TKIP.
+B) WPA2-Personal uses a pre-shared key; WPA2-Enterprise uses 802.1X/EAP with an authentication server such as RADIUS.
+C) WPA2-Enterprise does not encrypt data.
+D) WPA2-Personal requires certificates on every client.
+answer: B
+explanation:
+Personal (PSK): una passphrase condivisa da tutti, adatta a casa e piccoli uffici. Enterprise: ogni utente si autentica con credenziali proprie o certificato tramite 802.1X/EAP verso un server RADIUS (es. Cisco ISE), con chiavi di cifratura diverse per ogni sessione. Entrambe usano AES-CCMP.
+reference: Exam topic 5.9 - Wireless security protocols
+[/Q]
+
+[Q]
+id: SEC-034
+domain: 5
+type: SINGLE
+text:
+Which encryption protocol is mandatory for WPA2?
+options:
+A) RC4
+B) TKIP
+C) AES-CCMP
+D) DES
+answer: C
+explanation:
+WPA2 (802.11i) richiede AES-CCMP. TKIP (basato su RC4) era la soluzione temporanea di WPA ed è deprecato; WEP usa RC4 ed è insicuro. WPA3 usa AES-GCMP-256 nella modalità Enterprise a 192 bit.
+reference: Exam topic 5.9 - Wireless security protocols
+[/Q]
+
+[Q]
+id: SEC-035
+domain: 5
+type: SINGLE
+text:
+In the GUI of a Cisco AireOS WLC, where is a WPA2 pre-shared key configured for a WLAN?
+options:
+A) Controller > Interfaces
+B) WLANs > (WLAN ID) > Security > Layer 2
+C) Wireless > Access Points > Radios
+D) Management > SNMP
+answer: B
+explanation:
+Percorso tipico: WLANs → Create New (profile name, SSID, ID) → General (Status Enabled, interface/interface group) → Security → Layer 2 (Layer 2 Security WPA+WPA2, WPA2 Policy con AES, Authentication Key Management: PSK, quindi formato ASCII e passphrase) → Apply.
+reference: Exam topic 5.10 - Configure and verify WLAN within the GUI using WPA2 PSK
+[/Q]
+
+[Q]
+id: SEC-036
+domain: 5
+type: SINGLE
+text:
+Which IPsec protocol provides confidentiality (encryption) in addition to integrity and authentication?
+options:
+A) AH
+B) ESP
+C) GRE
+D) IKE
+answer: B
+explanation:
+ESP (Encapsulating Security Payload, IP protocol 50) fornisce cifratura, integrità e autenticazione. AH (protocol 51) fornisce solo integrità e autenticazione, senza cifratura, e non è compatibile con il NAT. IKE negozia le chiavi; GRE è un tunnel senza cifratura.
+reference: Exam topic 5.5 - Describe IPsec remote access and site-to-site VPNs
+[/Q]
+
+[Q]
+id: SEC-037
+domain: 5
+type: SINGLE
+text:
+Which protocol is used to negotiate security associations and exchange keys for IPsec VPNs?
+options:
+A) IKE (ISAKMP)
+B) SSL
+C) GRE
+D) L2TP
+answer: A
+explanation:
+IKE (Internet Key Exchange, UDP 500, oppure 4500 con NAT-T) autentica i peer (PSK o certificati), negozia gli algoritmi e genera le chiavi, creando le SA di IPsec. IKEv2 è la versione moderna.
+reference: Exam topic 5.5 - IPsec VPNs
+[/Q]
+
+[Q]
+id: SEC-038
+domain: 5
+type: SINGLE
+text:
+Which example is a physical access control?
+options:
+A) An ACL on the WAN router
+B) A badge reader on the data center door
+C) An 802.1X policy on switch ports
+D) Port security on access switches
+answer: B
+explanation:
+Controlli di accesso fisico: badge, serrature, tornelli, telecamere, armadi rack chiusi a chiave, registri dei visitatori, sistemi biometrici all'ingresso. Fanno parte del programma di sicurezza insieme alla formazione degli utenti e ai controlli tecnici.
+reference: Exam topic 5.2 - Security program elements (physical access control)
+[/Q]
+
+[Q]
+id: SEC-039
+domain: 5
+type: SINGLE
+text:
+An attacker uses thousands of compromised devices (a botnet) to overwhelm a web server with traffic. What type of attack is this?
+options:
+A) Phishing
+B) Man-in-the-middle
+C) Distributed denial of service (DDoS)
+D) Reconnaissance
+answer: C
+explanation:
+DoS: rendere un servizio indisponibile esaurendone le risorse (banda, CPU, sessioni). DDoS: lo stesso, ma da molte sorgenti distribuite (botnet), il che rende difficile filtrare per IP sorgente. Mitigazioni: servizi anti-DDoS del provider, rate limiting, CDN.
+reference: Exam topic 5.1 - Key security concepts (threats)
+[/Q]
+
+[Q]
+id: SEC-040
+domain: 5
+type: SINGLE
+text:
+An attacker runs a tool that sends packets to a range of IP addresses and TCP ports to discover live hosts and open services. What type of attack is this?
+options:
+A) Reconnaissance
+B) Buffer overflow
+C) DHCP starvation
+D) Password attack
+answer: A
+explanation:
+La ricognizione (ping sweep, port scan, query DNS e WHOIS, raccolta di informazioni pubbliche) è la prima fase di un attacco: serve a individuare bersagli e vulnerabilità. Si mitiga con firewall, IPS e riducendo le informazioni esposte (es. disabilitando CDP verso l'esterno).
+reference: Exam topic 5.1 - Key security concepts
+[/Q]
+
+[Q]
+id: SEC-041
+domain: 5
+type: SINGLE
+text:
+An attacker on the LAN sends gratuitous ARP replies that associate the default gateway IP address with the attacker's MAC address. Which switch feature mitigates this attack?
+options:
+A) BPDU Guard
+B) Dynamic ARP Inspection
+C) PortFast
+D) Root Guard
+answer: B
+explanation:
+È ARP spoofing/poisoning, che porta a un attacco man-in-the-middle: il traffico verso il gateway passa dall'attaccante. DAI scarta gli ARP sulle porte untrusted la cui coppia IP-MAC non corrisponde alla binding table DHCP snooping.
+reference: Exam topic 5.7 - Dynamic ARP inspection
+[/Q]
+
+[Q]
+id: SEC-042
+domain: 5
+type: SINGLE
+text:
+Which global command requires all newly configured passwords on a Cisco IOS device to be at least 10 characters long?
+options:
+A) password min-length 10
+B) security passwords min-length 10
+C) service password-length 10
+D) enable secret length 10
+answer: B
+explanation:
+"security passwords min-length" impone una lunghezza minima a password utente, enable e di linea. Altri elementi delle password policy: complessità, scadenza, MFA, divieto di riutilizzo. Sono alternative alle password: certificati, biometria, autenticazione centralizzata.
+reference: Exam topic 5.4 - Describe security password policies elements
+[/Q]
+
+[Q]
+id: SEC-043
+domain: 5
+type: SINGLE
+text:
+What is the effect of "login block-for 120 attempts 3 within 60"?
+options:
+A) Users are disconnected after 120 seconds of inactivity.
+B) If 3 failed login attempts occur within 60 seconds, further login attempts are blocked for 120 seconds.
+C) Only 3 users can be connected within 60 seconds.
+D) Each user can log in only 3 times per 120 minutes.
+answer: B
+explanation:
+È una protezione contro gli attacchi brute force e a dizionario sulle linee VTY. Durante il blocco ("quiet period") si possono comunque ammettere host fidati con "login quiet-mode access-class <ACL>". "exec-timeout" gestisce invece la disconnessione per inattività.
+reference: Exam topic 5.3 / 5.4 - Device access control and password policies
+[/Q]
+
+[Q]
+id: SEC-044
+domain: 5
+type: SINGLE
+text:
+What is the role of a digital certificate in a PKI?
+options:
+A) It encrypts all traffic with a shared symmetric key.
+B) It binds a public key to an identity and is signed by a trusted certificate authority (CA).
+C) It stores the user's password in hashed form.
+D) It replaces the need for any private key.
+answer: B
+explanation:
+Un certificato X.509 contiene la chiave pubblica del soggetto e informazioni sulla sua identità, firmati dalla CA. Chi si fida della CA può verificare che la chiave pubblica appartiene davvero a quel soggetto (server HTTPS, client 802.1X EAP-TLS, peer VPN). La chiave privata resta segreta presso il proprietario.
+reference: Exam topic 5.4 - Password alternatives (certificates)
+[/Q]
+
+[Q]
+id: SEC-045
+domain: 5
+type: MULTI
+text:
+Which two actions are best practices for securing management access to network devices?
+options:
+A) Use SSH instead of Telnet for remote CLI access.
+B) Configure "enable password" instead of "enable secret".
+C) Disable unused services and shut down unused ports.
+D) Use SNMPv1 with the community string "public".
+E) Enable the HTTP server for GUI management.
+answer: A, C
+explanation:
+Hardening: SSH (non Telnet), HTTPS (non HTTP), "enable secret", SNMPv3, ACL sulle linee VTY, banner, timeout delle sessioni, servizi inutilizzati disabilitati, porte inutilizzate spente e assegnate a una VLAN inutilizzata, logging e NTP per l'audit.
+reference: Exam topic 5.3 - Configure and verify device access control
+[/Q]
