@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -11,7 +10,7 @@ import com.lordoc.model.ExamResult;
 import com.lordoc.model.ExamSession;
 
 /** Revisione dopo l'esame: domanda, risposta data, risposta corretta e spiegazione. */
-public final class ReviewActivity extends Activity {
+public final class ReviewActivity extends BaseActivity {
 
     static final String EXTRA_INDEXES = "indexes";
     static final String EXTRA_START = "start";

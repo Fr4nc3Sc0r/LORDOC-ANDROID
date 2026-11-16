@@ -213,16 +213,16 @@ id: IPS-012
 domain: 4
 type: SINGLE
 text:
-Which DNS record type maps a hostname to an IPv6 address?
+A user can open a web server by typing http://192.0.2.10 but not by typing http://intranet.example.com. Other applications work normally. Which service is most likely failing?
 options:
-A) A
-B) AAAA
-C) CNAME
-D) PTR
+A) DHCP
+B) DNS
+C) NAT
+D) NTP
 answer: B
 explanation:
-A = nome → IPv4; AAAA ("quad A") = nome → IPv6; CNAME = alias; PTR = IP → nome (reverse lookup); MX = server di posta; NS = name server.
-DNS usa UDP 53 per le query e TCP 53 per zone transfer e risposte grandi. Su IOS: "ip name-server" e "ip domain-lookup".
+Il DNS traduce i nomi in indirizzi IP (record A per IPv4, AAAA per IPv6). Se l'indirizzo IP funziona e il nome no, la connettività c'è: manca la risoluzione del nome (server DNS errato o irraggiungibile, record mancante).
+DHCP assegna indirizzo, gateway e server DNS: se fallisse, l'host non raggiungerebbe nemmeno 192.0.2.10. Verifica utile su Windows: "nslookup intranet.example.com" o "ipconfig /all".
 reference: Exam topic 4.3 - Explain the role of DHCP and DNS within the network
 [/Q]
 

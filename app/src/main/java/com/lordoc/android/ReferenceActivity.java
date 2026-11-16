@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
@@ -11,7 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /** Elenco delle schede del cheat sheet (lette da assets/reference/index.txt). */
-public final class ReferenceActivity extends Activity {
+public final class ReferenceActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

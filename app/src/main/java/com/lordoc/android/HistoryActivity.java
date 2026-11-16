@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.Button;
@@ -17,11 +16,16 @@ import java.util.List;
 import java.util.Map;
 
 /** Storico degli esami, grafico dei punteggi e accuratezza complessiva per dominio. */
-public final class HistoryActivity extends Activity {
+public final class HistoryActivity extends BaseActivity {
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private LinearLayout root;
+
+    @Override
+    protected boolean showBanner() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

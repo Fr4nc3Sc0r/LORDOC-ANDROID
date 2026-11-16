@@ -1,8 +1,8 @@
 # Lordoc Android
 
 Versione **Android** di Lordoc, il simulatore d'esame per la preparazione alla certificazione
-**Cisco CCNA 200-301**. Scritta in **Java** usando solo le API standard di Android, senza librerie
-esterne.
+**Cisco CCNA 200-301**. Scritta in **Java** con le API standard di Android; l'unica libreria esterna è
+Google Mobile Ads (AdMob) con la User Messaging Platform per il consenso GDPR.
 
 > Realizzato in collaborazione con **Anthropic Claude**.
 
@@ -29,16 +29,17 @@ esterne.
 | **Cheat sheet** | 12 schede di ripasso (subnetting, IPv6, OSPF, STP, wireless, porte, sicurezza, automazione, comandi IOS…). |
 | **Calcolatore subnet** | Rete, broadcast, range host, wildcard, magic number e rappresentazione binaria. |
 | **Importa domande** | Aggiungi file `.txt` di domande scritti nel formato di Lordoc, direttamente dal telefono. |
+| **Privacy** | Nessun account. Storico e statistiche restano sul telefono. Annunci AdMob con richiesta di consenso (UE) e voce di menu per modificarlo; mai annunci durante un esame. |
 
 ## Contenuti
 
-298 domande originali sul blueprint **CCNA 200-301 v1.1**, più le domande di subnetting generate senza
+303 domande originali sul blueprint **CCNA 200-301 v1.1**, più le domande di subnetting generate senza
 limiti. Testo e opzioni sono in inglese, come all'esame reale; le spiegazioni sono in italiano.
 
 | Dominio | Peso | Domande |
 |---|---|---|
-| 1.0 Network Fundamentals | 20% | 63 |
-| 2.0 Network Access | 20% | 55 |
+| 1.0 Network Fundamentals | 20% | 65 |
+| 2.0 Network Access | 20% | 58 |
 | 3.0 IP Connectivity | 25% | 61 |
 | 4.0 IP Services | 10% | 39 |
 | 5.0 Security Fundamentals | 15% | 45 |
@@ -53,7 +54,9 @@ limiti. Testo e opzioni sono in inglese, come all'esame reale; le spiegazioni so
 2. Copia `app-debug.apk` sul telefono e aprilo. Android chiederà di consentire l'installazione da
    "origini sconosciute" per l'app con cui lo apri (es. File o Chrome): consentilo per questa volta.
 
-Serve **Android 8.0** o successivo.
+Serve **Android 8.0** o successivo. L'app è compilata per **Android 16** (API 36).
+
+L'APK di debug mostra solo **annunci di prova** di Google.
 
 ## Compilare il progetto
 
@@ -77,6 +80,25 @@ indicare dove si trova).
 ./gradlew lintDebug            # controlli di Android (compatibilità, errori comuni)
 ```
 
+### Build di release (Google Play)
+
+La chiave di firma e gli ID AdMob **non sono nel repository**. Copia `release.properties.example` in
+`release.properties` (ignorato da Git) e compila i valori, oppure impostali come variabili d'ambiente
+con gli stessi nomi. Poi:
+
+```bash
+./gradlew bundleRelease        # AAB da caricare su Google Play: app/build/outputs/bundle/release/
+./gradlew assembleRelease      # APK firmato (per prove): app/build/outputs/apk/release/
+```
+
+Se manca un valore la build si ferma con l'elenco di cosa manca. Crea il keystore una sola volta
+(e conservane una copia di sicurezza fuori dal progetto):
+
+```bash
+keytool -genkeypair -v -keystore ../chiavi/lordoc-upload.jks -alias lordoc-upload \
+        -keyalg RSA -keysize 2048 -validity 10000
+```
+
 ## Struttura del progetto
 
 ```
@@ -84,11 +106,12 @@ LORDOC-ANDROID/
 ├── settings.gradle, build.gradle, gradle.properties   configurazione di Gradle
 ├── gradlew, gradlew.bat, gradle/wrapper/              Gradle "incorporato" (non va installato)
 ├── .github/workflows/build.yml                        CI: test, lint e APK scaricabile
+├── release.properties.example                         modello per chiave di firma e ID AdMob
 └── app/
     ├── build.gradle                                   versione dell'app, SDK minimo e di destinazione
     └── src/
         ├── main/
-        │   ├── AndroidManifest.xml                    schermate dell'app
+        │   ├── AndroidManifest.xml                    schermate dell'app, ID app AdMob
         │   ├── assets/questions/                      banca domande (.txt) + index.txt
         │   ├── assets/reference/                      cheat sheet (.html) + index.txt
         │   ├── res/                                   tema, colori, icona
@@ -112,6 +135,8 @@ LORDOC-ANDROID/
 | `QuestionRenderer` | disegna una domanda (usata da esame e revisione) |
 | `ScoreBarView`, `ScoreChartView` | barra del punteggio e grafico disegnati a mano |
 | `LordocApp` | carica domande e dati all'avvio, conserva l'esame in corso |
+| `BaseActivity` | base di tutte le schermate: barra del titolo, spazio per il banner, margini edge-to-edge |
+| `Ads` | pubblicità AdMob: consenso (UMP), banner, interstitial dopo la consegna |
 | `Ui` | colori e funzioni comuni per creare i componenti |
 
 ### Rapporto con Lordoc desktop

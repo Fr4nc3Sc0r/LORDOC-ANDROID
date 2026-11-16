@@ -2,21 +2,75 @@ plugins {
     id 'com.android.application'
 }
 
+// ---------------------------------------------------------------------------------------------
+// Valori "privati" della build di release: chiave di firma e ID AdMob.
+// NON stanno su Git: si leggono, in quest'ordine, da
+//   1. il file release.properties nella cartella del progetto (escluso da .gitignore),
+//   2. le variabili d'ambiente (utile su GitHub Actions, come "secrets"),
+//   3. le proprietà Gradle (-PLORDOC_...=... oppure ~/.gradle/gradle.properties).
+// Modello da copiare: release.properties.example
+// ---------------------------------------------------------------------------------------------
+def releaseProps = new Properties()
+def releasePropsFile = rootProject.file('release.properties')
+if (releasePropsFile.exists()) {
+    releasePropsFile.withInputStream { releaseProps.load(it) }
+}
+def secret = { String name ->
+    def v = releaseProps.getProperty(name) ?: System.getenv(name) ?: project.findProperty(name)
+    return v == null ? '' : v.toString().trim()
+}
+
+// ID di prova pubblicati da Google: mostrano annunci finti, sicuri da cliccare.
+def TEST_APP_ID = 'ca-app-pub-3940256099942544~3347511713'
+def TEST_BANNER_ID = 'ca-app-pub-3940256099942544/9214589741'
+def TEST_INTERSTITIAL_ID = 'ca-app-pub-3940256099942544/1033173712'
+
+def RELEASE_KEYS = ['LORDOC_KEYSTORE_FILE', 'LORDOC_KEYSTORE_PASSWORD', 'LORDOC_KEY_ALIAS', 'LORDOC_KEY_PASSWORD',
+                    'LORDOC_ADMOB_APP_ID', 'LORDOC_ADMOB_BANNER_ID', 'LORDOC_ADMOB_INTERSTITIAL_ID',
+                    'LORDOC_PRIVACY_URL']
+
 android {
     namespace 'com.lordoc.android'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.lordoc.android'
         minSdk 26          // Android 8.0: serve per java.nio.file (storico e statistiche)
-        targetSdk 35
-        versionCode 1
-        versionName '1.0.0'
+        targetSdk 36       // Android 16: obbligatorio per le nuove app su Google Play
+        versionCode 2
+        versionName '1.1.0'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            if (secret('LORDOC_KEYSTORE_FILE')) {
+                storeFile rootProject.file(secret('LORDOC_KEYSTORE_FILE'))
+                storePassword secret('LORDOC_KEYSTORE_PASSWORD')
+                keyAlias secret('LORDOC_KEY_ALIAS')
+                keyPassword secret('LORDOC_KEY_PASSWORD')
+            }
+        }
     }
 
     buildTypes {
+        debug {
+            // In debug SEMPRE annunci di prova: cliccare annunci veri propri è vietato da AdMob.
+            manifestPlaceholders = [admobAppId: TEST_APP_ID]
+            buildConfigField 'String', 'ADMOB_BANNER_ID', "\"${TEST_BANNER_ID}\""
+            buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', "\"${TEST_INTERSTITIAL_ID}\""
+            buildConfigField 'String', 'PRIVACY_POLICY_URL', "\"${secret('LORDOC_PRIVACY_URL')}\""
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
+            manifestPlaceholders = [admobAppId: secret('LORDOC_ADMOB_APP_ID') ?: TEST_APP_ID]
+            buildConfigField 'String', 'ADMOB_BANNER_ID', "\"${secret('LORDOC_ADMOB_BANNER_ID')}\""
+            buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', "\"${secret('LORDOC_ADMOB_INTERSTITIAL_ID')}\""
+            buildConfigField 'String', 'PRIVACY_POLICY_URL', "\"${secret('LORDOC_PRIVACY_URL')}\""
         }
     }
 
@@ -37,10 +91,31 @@ android {
     }
 }
 
-// L'app non ha dipendenze esterne: usa solo le API standard di Android e Java.
-// Le librerie qui sotto servono SOLO ai test automatici (non finiscono nell'APK).
+// Una build di release (APK o AAB) senza chiave o senza ID veri si ferma con un messaggio chiaro,
+// invece di produrre un'app non firmata o con gli annunci di prova.
+gradle.taskGraph.whenReady { graph ->
+    def releasePackaging = graph.allTasks.any {
+        it.project == project && it.name ==~ /(assemble|bundle|package|sign)Release.*/
+    }
+    if (releasePackaging) {
+        def missing = RELEASE_KEYS.findAll { !secret(it) }
+        if (missing) {
+            throw new GradleException("Build di release: mancano " + missing.join(', ')
+                + ". Copia release.properties.example in release.properties e compilalo (vedi README).")
+        }
+        if (!rootProject.file(secret('LORDOC_KEYSTORE_FILE')).exists()) {
+            throw new GradleException("Keystore non trovato: " + secret('LORDOC_KEYSTORE_FILE'))
+        }
+    }
+}
+
 dependencies {
+    // Pubblicità (Google AdMob) e consenso GDPR (User Messaging Platform).
+    implementation 'com.google.android.gms:play-services-ads:25.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
+
+    // Solo per i test automatici (non finiscono nell'APK).
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.14.1'
-    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'org.robolectric:robolectric:4.16'
+    testImplementation 'androidx.test:core:1.7.0'
 }

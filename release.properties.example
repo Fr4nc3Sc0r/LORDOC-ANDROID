@@ -1,0 +1,19 @@
+# Copia questo file in "release.properties" (stessa cartella) e compila i valori.
+# release.properties è escluso da .gitignore: NON finisce mai su GitHub.
+# In alternativa puoi impostare gli stessi nomi come variabili d'ambiente.
+
+# Keystore di caricamento (upload key) creato con keytool o con Android Studio.
+# Percorso relativo alla cartella del progetto oppure assoluto. Tienilo FUORI dal repository
+# e fanne una copia di sicurezza: se lo perdi dovrai chiedere a Google il reset della chiave.
+LORDOC_KEYSTORE_FILE=../chiavi/lordoc-upload.jks
+LORDOC_KEYSTORE_PASSWORD=
+LORDOC_KEY_ALIAS=lordoc-upload
+LORDOC_KEY_PASSWORD=
+
+# ID AdMob (console AdMob > App > Impostazioni app / Unità pubblicitarie)
+LORDOC_ADMOB_APP_ID=ca-app-pub-0000000000000000~0000000000
+LORDOC_ADMOB_BANNER_ID=ca-app-pub-0000000000000000/0000000000
+LORDOC_ADMOB_INTERSTITIAL_ID=ca-app-pub-0000000000000000/0000000000
+
+# Indirizzo pubblico dell'informativa privacy (la pagina WordPress creata con Elementor)
+LORDOC_PRIVACY_URL=https://www.tuosito.it/lordoc-privacy/

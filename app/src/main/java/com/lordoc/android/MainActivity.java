@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 
 /** Menu principale: esami predefiniti, altre modalità, strumenti e copertura per dominio. */
-public final class MainActivity extends Activity {
+public final class MainActivity extends BaseActivity {
 
     private static final int REQ_IMPORT = 1;
     private static final String PREFS = "lordoc";
@@ -52,10 +51,25 @@ public final class MainActivity extends Activity {
         app = LordocApp.get(this);
         root = Ui.vertical(this);
         setContentView(Ui.page(this, root));
+        // consenso GDPR (se serve) e avvio della pubblicità; poi banner e menu si aggiornano
+        Ads.requestConsentAndStart(this, () -> {
+            refreshBanner();
+            build();
+        });
         if (!errorsShown && !app.getBank().getErrors().isEmpty()) {
             errorsShown = true;
             showLoadErrors();
         }
+    }
+
+    @Override
+    protected boolean showBackArrow() {
+        return false;
+    }
+
+    @Override
+    protected boolean showBanner() {
+        return true;
     }
 
     @Override
@@ -125,6 +139,19 @@ public final class MainActivity extends Activity {
         }
         root.addView(cov, Ui.full(this, 10));
 
+        // --- privacy e informazioni
+        root.addView(Ui.section(this, "Privacy e informazioni"));
+        if (!BuildConfig.PRIVACY_POLICY_URL.isEmpty()) {
+            addMode("Informativa privacy", "Quali dati usa l'app e la pubblicità, e i tuoi diritti.",
+                v -> openPrivacyPolicy());
+        }
+        if (Ads.privacyOptionsRequired(this)) {
+            addMode("Preferenze privacy e pubblicità", "Rivedi o ritira il consenso agli annunci personalizzati.",
+                v -> Ads.showPrivacyOptions(this, () -> {
+                    refreshBanner();
+                    build();
+                }));
+        }
         Button about = Ui.button(this, "Informazioni", v -> showAbout());
         root.addView(about, Ui.full(this, 0));
     }
@@ -329,11 +356,21 @@ public final class MainActivity extends Activity {
             .setPositiveButton("OK", null).show();
     }
 
+    private void openPrivacyPolicy() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.PRIVACY_POLICY_URL)));
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(this, BuildConfig.PRIVACY_POLICY_URL, Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void showAbout() {
         TextView t = Ui.text(this, "Lordoc " + LordocApp.VERSION + "\n\n"
             + "Simulatore d'esame per la preparazione alla certificazione Cisco CCNA 200-301.\n"
             + "Domande nella banca: " + app.getBank().size() + "\n\n"
             + "Realizzato in collaborazione con Anthropic Claude.\n\n"
+            + "L'app è gratuita e si sostiene con annunci pubblicitari (Google AdMob), mai mostrati "
+            + "durante lo svolgimento di un esame.\n\n"
             + "Progetto indipendente, non affiliato a Cisco Systems. "
             + "CCNA è un marchio registrato di Cisco Systems, Inc.", 15, Ui.TEXT, false);
         int p = Ui.dp(this, 20);

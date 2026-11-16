@@ -538,15 +538,17 @@ id: IPC-028
 domain: 3
 type: SINGLE
 text:
-R1 learns 2001:DB8:5::/64 through OSPFv3. Which command creates a backup static route through 2001:DB8:1::2 that is used only if the OSPFv3 route is lost?
+R1 reaches 2001:DB8:5::/64 through a primary IPv6 static route via 2001:DB8:1::1. Which command adds a backup route via 2001:DB8:1::2 that is installed in the routing table only if the primary route fails?
 options:
 A) ipv6 route 2001:DB8:5::/64 2001:DB8:1::2
 B) ipv6 route 2001:DB8:5::/64 2001:DB8:1::2 1
-C) ipv6 route 2001:DB8:5::/64 2001:DB8:1::2 100
-D) ipv6 route 2001:DB8:5::/64 2001:DB8:1::2 200
-answer: D
+C) ipv6 route 2001:DB8:5::/64 2001:DB8:1::2 5
+D) ipv6 route ::/0 2001:DB8:1::2
+answer: C
 explanation:
-OSPFv3 ha AD 110: la floating static deve avere un'AD maggiore, quindi 200 è corretto. Con AD 1 (default) o 100 la statica prevarrebbe sulla route OSPFv3.
+Una floating static route è una statica con distanza amministrativa (AD) più alta di quella principale. La statica primaria ha AD 1 (default); scrivendo 5 alla fine del comando la route di backup "galleggia" e compare nella tabella solo se la primaria sparisce (es. interfaccia giù o next hop non raggiungibile).
+A e B hanno AD 1: le due route sarebbero equivalenti e il router farebbe load balancing. D è una default route: non è specifica per la rete e non è un backup.
+Chicca: per fare da backup a una route dinamica l'AD deve superare quella del protocollo (es. > 110 per OSPF).
 reference: Exam topic 3.3.d - Floating static (IPv6)
 [/Q]
 
@@ -664,16 +666,17 @@ id: IPC-035
 domain: 3
 type: SINGLE
 text:
-In a multi-area OSPF design, to which area must every other area be connected?
+An engineer deploys single-area OSPFv2 on all routers of a small campus. Which area ID is the best choice so that the design can later grow into a multi-area design without renumbering?
 options:
-A) The area with the lowest number of routers
-B) Area 0, the backbone area
-C) Any stub area
-D) The area containing the DR
+A) Area 1
+B) Area 0
+C) Area 255
+D) A different area on each router
 answer: B
 explanation:
-Area 0 è il backbone: tutte le altre aree devono essere collegate a essa tramite un ABR (Area Border Router), che riassume le informazioni tra aree con LSA type 3. Il blueprint CCNA si concentra su OSPF single-area, ma questo concetto è fondamentale.
-reference: Exam topic 3.4 - OSPFv2
+Area 0 è l'area backbone: in un futuro design multi-area tutte le altre aree dovranno collegarsi a essa. Mettendo subito tutte le interfacce in area 0 la rete single-area è già il backbone e le nuove aree si aggiungeranno ai bordi.
+Un'area single-area con un altro numero funziona, ma andrebbe rinumerata. Usare aree diverse su ogni router (D) creerebbe un multi-area mal progettato e le adiacenze non si formerebbero tra interfacce in aree diverse.
+reference: Exam topic 3.4 - Configure and verify single area OSPFv2
 [/Q]
 
 [Q]
@@ -779,15 +782,16 @@ id: IPC-042
 domain: 3
 type: SINGLE
 text:
-By default, which two components are used by EIGRP to calculate its composite metric?
+R1 runs only OSPF and learns 10.20.0.0/24 from two neighbors: via R2 with cost 20 and via R3 with cost 30. Which statement is true?
 options:
-A) Hop count and delay
-B) Bandwidth and delay
-C) Load and reliability
-D) Cost and MTU
+A) Both routes are installed because they have the same administrative distance.
+B) The route via R2 is installed because it has the lower metric.
+C) The route via R3 is installed because it has the higher metric.
+D) The route learned first is installed.
 answer: B
 explanation:
-Con i K-value di default (K1 = K3 = 1, gli altri 0) EIGRP usa la banda minima lungo il percorso e la somma dei ritardi. EIGRP è un protocollo "advanced distance vector" (Cisco, poi pubblicato come RFC 7868) con AD 90 interno e 170 esterno.
+L'administrative distance (AD) serve a scegliere tra fonti diverse (es. OSPF contro statica). Quando le route arrivano dallo stesso protocollo, l'AD è uguale e decide la metrica: per OSPF il costo più basso, quindi la route via R2 (20).
+Solo se i costi fossero uguali OSPF installerebbe entrambe le route (ECMP, load balancing).
 reference: Exam topic 3.2.c - Routing protocol metric
 [/Q]
 
@@ -992,16 +996,18 @@ id: IPC-054
 domain: 3
 type: SINGLE
 text:
-Which value does RIP use as its metric, and what value means unreachable?
+R1 has these routes: 10.0.0.0/8 static via 192.168.1.1 (AD 1), 10.1.0.0/16 via OSPF next hop 192.168.2.1 (AD 110), 10.1.1.0/26 via OSPF next hop 192.168.3.1 (AD 110), and a default route via 192.168.4.1. Which next hop is used for a packet to 10.1.1.70?
 options:
-A) Cost; 255 is unreachable
-B) Hop count; 16 is unreachable
-C) Bandwidth; 0 is unreachable
-D) Hop count; 255 is unreachable
+A) 192.168.1.1
+B) 192.168.2.1
+C) 192.168.3.1
+D) 192.168.4.1
 answer: B
 explanation:
-RIP (distance vector, AD 120) usa l'hop count, con un massimo di 15 hop; 16 = infinito (irraggiungibile). Invia aggiornamenti ogni 30 secondi. RIPv2 supporta VLSM e usa il multicast 224.0.0.9.
-reference: Exam topic 3.2.c - Routing protocol metric
+Il router sceglie prima la corrispondenza più lunga (longest prefix match); AD e metrica servono solo tra route con lo stesso prefisso.
+10.1.1.0/26 copre gli indirizzi 10.1.1.0-10.1.1.63: 10.1.1.70 NON vi rientra. La corrispondenza più lunga è allora 10.1.0.0/16 (next hop 192.168.2.1). La statica /8 ha AD migliore ma il prefisso è più corto, quindi non conta.
+Trappola tipica: guardare l'AD prima della lunghezza del prefisso, oppure non controllare se l'indirizzo cade davvero nella subnet.
+reference: Exam topic 3.2 - Determine how a router makes a forwarding decision by default (longest prefix match, AD, metric)
 [/Q]
 
 [Q]

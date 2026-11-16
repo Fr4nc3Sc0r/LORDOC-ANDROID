@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Tema chiaro di sistema (nessuna libreria esterna), con i colori di Lordoc. -->
-    <style name="Theme.Lordoc" parent="android:Theme.Material.Light.DarkActionBar">
+    <!--
+        Tema chiaro di sistema senza ActionBar: la barra del titolo la disegna BaseActivity,
+        così funziona anche in modalità edge-to-edge (obbligatoria da Android 15/16).
+    -->
+    <style name="Theme.Lordoc" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
 </resources>

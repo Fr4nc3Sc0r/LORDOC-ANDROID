@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /** Configurazione di un esame personalizzato. */
-public final class CustomExamActivity extends Activity {
+public final class CustomExamActivity extends BaseActivity {
 
     private final Map<Domain, CheckBox> domainBoxes = new EnumMap<>(Domain.class);
     private EditText title;

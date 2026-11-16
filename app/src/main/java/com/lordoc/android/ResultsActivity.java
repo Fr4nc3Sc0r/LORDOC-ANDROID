@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 
 /** Report finale: punteggio, risultato per dominio, elenco domande e revisione. */
-public final class ResultsActivity extends Activity {
+public final class ResultsActivity extends BaseActivity {
+
+    /** Extra dell'Intent: true quando il report arriva direttamente dalla consegna di un esame. */
+    static final String EXTRA_JUST_DELIVERED = "justDelivered";
 
     private static final String[] FILTERS = {"Tutte", "Solo errate / incomplete", "Solo corrette", "Solo marcate"};
 
@@ -34,6 +36,11 @@ public final class ResultsActivity extends Activity {
     private ExamSession session;
     private LinearLayout list;
     private final List<Integer> visible = new ArrayList<>();
+
+    @Override
+    protected boolean showBanner() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,10 @@ public final class ResultsActivity extends Activity {
         setTitle("Risultati");
         LinearLayout root = Ui.vertical(this);
         setContentView(Ui.page(this, root));
+        // appena consegnato un esame: momento di pausa naturale per un eventuale interstitial
+        if (savedInstanceState == null && getIntent().getBooleanExtra(EXTRA_JUST_DELIVERED, false)) {
+            Ads.maybeShowInterstitial(this);
+        }
 
         // --- intestazione
         boolean pass = result.isPassed();

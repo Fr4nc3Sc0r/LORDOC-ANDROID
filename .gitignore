@@ -17,9 +17,13 @@ captures/
 .externalNativeBuild/
 .cxx/
 
-# Chiavi di firma: mai su git
+# Chiavi di firma e ID privati della release: mai su git
 *.jks
 *.keystore
+*.p12
+*.pem
+release.properties
+keystore.properties
 
 # IDE
 .idea/

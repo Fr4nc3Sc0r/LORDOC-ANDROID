@@ -1,13 +1,15 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Button;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -22,12 +24,13 @@ import com.lordoc.model.Question;
 import com.lordoc.util.Text;
 
 /** Svolgimento dell'esame: una domanda alla volta, con cronometro, marcatura e consegna. */
-public final class ExamActivity extends Activity {
+public final class ExamActivity extends BaseActivity {
 
     private LordocApp app;
     private ExamSession session;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean finished;
+    private OnBackInvokedCallback backCallback;
 
     private TextView counter;
     private TextView timer;
@@ -64,6 +67,34 @@ public final class ExamActivity extends Activity {
         setTitle(session.getTitle() + " — " + session.getMode().getLabel());
         setContentView(buildLayout());
         show(session.getCurrent());
+        registerBackHandler();
+        Ads.preloadInterstitial(this);
+    }
+
+    /**
+     * Gesto/tasto "indietro". Da Android 13 (API 33) il sistema usa il "predictive back" e, per le
+     * app che puntano ad Android 16, non chiama più onBackPressed(): registriamo una callback che
+     * intercetta l'indietro e chiede conferma. Sulle versioni precedenti resta onBackPressed().
+     */
+    private void registerBackHandler() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            backCallback = this::confirmExit;
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT, backCallback);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (Build.VERSION.SDK_INT >= 33 && backCallback != null) {
+            getOnBackInvokedDispatcher().unregisterOnBackInvokedCallback(backCallback);
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onHeaderBack() {
+        confirmExit();
     }
 
     @Override
@@ -279,13 +310,22 @@ public final class ExamActivity extends Activity {
         app.getStore().recordResult(result);
         app.setLastResult(result);
         app.clearSession();
-        startActivity(new Intent(this, ResultsActivity.class));
+        startActivity(new Intent(this, ResultsActivity.class)
+            .putExtra(ResultsActivity.EXTRA_JUST_DELIVERED, true));
         finish();
     }
 
+    /**
+     * Android 12 e precedenti: tasto indietro classico. Da Android 13 l'indietro passa dalla
+     * callback registrata in {@link #registerBackHandler()}, quindi l'avviso di lint non si applica.
+     */
     @Override
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "GestureBackNavigation"})
     public void onBackPressed() {
+        confirmExit();
+    }
+
+    private void confirmExit() {
         new AlertDialog.Builder(this)
             .setTitle("Abbandonare l'esame?")
             .setMessage("Le risposte date andranno perse.")

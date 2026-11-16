@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
 
@@ -10,7 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /** Mostra una scheda HTML del cheat sheet, adattata allo schermo del telefono. */
-public final class ReferencePageActivity extends Activity {
+public final class ReferencePageActivity extends BaseActivity {
 
     static final String EXTRA_FILE = "file";
     static final String EXTRA_TITLE = "title";

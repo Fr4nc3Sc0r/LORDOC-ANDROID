@@ -531,15 +531,16 @@ id: SEC-030
 domain: 5
 type: SINGLE
 text:
-Which command must be entered first to enable AAA features such as RADIUS or TACACS+ authentication on a Cisco IOS device?
+Which AAA function records which commands an administrator entered on a router and when the session started and ended?
 options:
-A) aaa enable
-B) aaa new-model
-C) radius-server enable
-D) login authentication aaa
-answer: B
+A) Authentication
+B) Authorization
+C) Accounting
+D) Auditing
+answer: C
 explanation:
-"aaa new-model" abilita il framework AAA; poi si definiscono i server (es. "tacacs server ...", "radius server ...") e le method list, ad esempio "aaa authentication login default group tacacs+ local". Attenzione: dopo "aaa new-model" le linee VTY usano subito l'autenticazione AAA (locale di default).
+AAA = Authentication (chi sei: credenziali), Authorization (cosa puoi fare: livelli, comandi permessi), Accounting (cosa hai fatto: registro di sessioni e comandi, utile per audit e fatturazione).
+"Auditing" non è una delle tre A. Esempio pratico: TACACS+ può autorizzare e registrare ogni singolo comando digitato.
 reference: Exam topic 5.8 - Compare authentication, authorization, and accounting concepts
 [/Q]
 
@@ -564,16 +565,17 @@ id: SEC-032
 domain: 5
 type: SINGLE
 text:
-A router is configured with "aaa authentication login default group tacacs+ local". When is the local user database used?
+What is a benefit of using a centralized AAA server (TACACS+ or RADIUS) instead of local usernames on every network device?
 options:
-A) Always, before contacting the TACACS+ server
-B) Only when the TACACS+ server is unreachable (it returns an error, not a rejection)
-C) When the TACACS+ server rejects the credentials
-D) Never; the keyword "local" is ignored
-answer: B
+A) User accounts are created and removed in one place and every login can be logged centrally.
+B) Devices no longer need any management IP address.
+C) Passwords are no longer required.
+D) It removes the need for SSH.
+answer: A
 explanation:
-I metodi di una method list vengono provati in ordine. Si passa al successivo solo se il precedente non risponde (errore); se il server TACACS+ risponde "fail" (credenziali errate), l'accesso viene negato senza provare il database locale. Il fallback "local" garantisce l'accesso di emergenza se il server è irraggiungibile.
-reference: Exam topic 5.8 - AAA
+Con un server AAA centrale l'account di un tecnico si crea o si disattiva una sola volta e vale su tutti i dispositivi; autorizzazioni e accounting sono uniformi e registrati in un unico punto.
+Buona pratica: tenere comunque un utente locale di emergenza, usato solo se il server non è raggiungibile. TACACS+ (TCP 49, Cisco) cifra tutto il pacchetto e separa le tre A; RADIUS (UDP 1812/1813, standard) cifra solo la password ed è tipico per l'accesso degli utenti alla rete (802.1X).
+reference: Exam topic 5.8 - Compare authentication, authorization, and accounting concepts
 [/Q]
 
 [Q]
@@ -632,33 +634,36 @@ id: SEC-036
 domain: 5
 type: SINGLE
 text:
-Which IPsec protocol provides confidentiality (encryption) in addition to integrity and authentication?
+Which statement describes a site-to-site IPsec VPN?
 options:
-A) AH
-B) ESP
-C) GRE
-D) IKE
+A) Each remote user runs VPN client software on a laptop to connect to the company.
+B) Two gateway devices (for example routers or firewalls) build a permanent encrypted tunnel, and hosts at both sites send normal, unencrypted traffic to their local gateway.
+C) It works only over private MPLS links, never over the internet.
+D) It requires each host to have a public IP address.
 answer: B
 explanation:
-ESP (Encapsulating Security Payload, IP protocol 50) fornisce cifratura, integrità e autenticazione. AH (protocol 51) fornisce solo integrità e autenticazione, senza cifratura, e non è compatibile con il NAT. IKE negozia le chiavi; GRE è un tunnel senza cifratura.
+Nella VPN site-to-site il tunnel IPsec è tra due gateway (router, firewall) delle due sedi: gli host non sanno nulla della VPN, inviano traffico normale e il gateway lo cifra (ESP) attraverso internet.
+La risposta A descrive invece la VPN remote access (un client per utente). Ripasso: IKE negozia chiavi e algoritmi, ESP cifra e autentica i dati; AH autentica soltanto.
 reference: Exam topic 5.5 - Describe IPsec remote access and site-to-site VPNs
 [/Q]
 
 [Q]
 id: SEC-037
 domain: 5
-type: SINGLE
+type: MULTI
 text:
-Which protocol is used to negotiate security associations and exchange keys for IPsec VPNs?
+Which two statements describe a remote-access VPN? (Choose two.)
 options:
-A) IKE (ISAKMP)
-B) SSL
-C) GRE
-D) L2TP
-answer: A
+A) It connects individual users, such as teleworkers, to the corporate network.
+B) It is always built between two routers with static configuration.
+C) It typically uses VPN client software (for example Cisco Secure Client) or a TLS/web-based connection.
+D) It is used only to connect two data centers.
+E) It requires a dedicated leased line.
+answer: A, C
 explanation:
-IKE (Internet Key Exchange, UDP 500, oppure 4500 con NAT-T) autentica i peer (PSK o certificati), negozia gli algoritmi e genera le chiavi, creando le SA di IPsec. IKEv2 è la versione moderna.
-reference: Exam topic 5.5 - IPsec VPNs
+La VPN remote access è "da utente a sede": il singolo dispositivo (portatile, smartphone) apre il tunnel verso un concentratore o firewall aziendale, di solito con un client (Cisco Secure Client, ex AnyConnect) su IPsec o TLS, oppure da browser (clientless).
+B e D descrivono una VPN site-to-site; nessuna delle due richiede linee dedicate perché passano su internet.
+reference: Exam topic 5.5 - Describe IPsec remote access and site-to-site VPNs
 [/Q]
 
 [Q]

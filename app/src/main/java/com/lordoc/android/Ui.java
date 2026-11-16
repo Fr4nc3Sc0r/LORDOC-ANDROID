@@ -18,6 +18,7 @@ import java.util.Locale;
 final class Ui {
 
     static final int HEADER = 0xFF1F3A5F;
+    static final int BACKGROUND = 0xFFF3F5F8;
     static final int SUB = 0xFFE8EEF5;
     static final int ACCENT = 0xFF2E6DB4;
     static final int OK = 0xFF2E7D32;

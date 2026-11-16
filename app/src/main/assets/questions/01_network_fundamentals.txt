@@ -1128,3 +1128,39 @@ explanation:
 Una sessione è identificata dalla 5-tupla (IP sorgente, IP destinazione, protocollo, porta sorgente, porta destinazione). Il client sceglie una porta sorgente effimera diversa (49152-65535) per ogni connessione verso la stessa porta 443 del server: questo è il multiplexing di Layer 4.
 reference: Exam topic 1.5 - Compare TCP to UDP
 [/Q]
+
+[Q]
+id: NF-064
+domain: 1
+type: SINGLE
+text:
+Which characteristic best describes a SOHO (small office/home office) network?
+options:
+A) A three-tier design with separate core, distribution and access layers
+B) A single multifunction device that combines router, switch, wireless AP and often firewall, connected to the ISP
+C) A spine-leaf fabric in which every leaf connects to every spine
+D) A dedicated MPLS WAN between many branch sites
+answer: B
+explanation:
+Una rete SOHO serve pochi utenti: di solito un unico apparato "tutto in uno" (router con NAT e DHCP, piccolo switch, access point Wi-Fi, firewall) collegato al modem/ONT dell'ISP.
+Three-tier e collapsed core sono tipici dei campus, spine-leaf dei data center, MPLS delle WAN aziendali.
+reference: Exam topic 1.2.e - Small office/home office (SOHO)
+[/Q]
+
+[Q]
+id: NF-065
+domain: 1
+type: SINGLE
+text:
+In a two-tier (collapsed core) campus design, which layers are combined?
+options:
+A) Access and distribution
+B) Core and distribution
+C) Core and access
+D) Spine and leaf
+answer: B
+explanation:
+Nel two-tier (collapsed core) il livello core e quello distribution sono riuniti in un'unica coppia di switch: sotto ci sono direttamente gli switch di accesso. È adatto a campus piccoli e medi e costa meno del three-tier, dove il core separato serve quando ci sono molti blocchi di distribuzione (es. più edifici).
+Spine-leaf è l'architettura tipica dei data center, non dei campus.
+reference: Exam topic 1.2.a - Two-tier
+[/Q]

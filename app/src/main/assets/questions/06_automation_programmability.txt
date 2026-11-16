@@ -34,7 +34,7 @@ explanation:
 - Control plane: decisioni su come inoltrare (protocolli di routing, STP, ARP)
 - Management plane: gestione del dispositivo (SSH, SNMP, Syslog, NTP, API)
 Nell'SDN il control plane viene in buona parte centralizzato nel controller.
-reference: Exam topic 6.1 - Explain how automation impacts network management / 6.2 SDN planes
+reference: Exam topic 6.3.a - Separation of control plane and data plane
 [/Q]
 
 [Q]
@@ -149,16 +149,17 @@ id: AUT-008
 domain: 6
 type: SINGLE
 text:
-What is a benefit of Cisco Catalyst Center (formerly DNA Center) compared to traditional box-by-box network management?
+What is a benefit of controller-based networking compared with traditional, box-by-box network management?
 options:
-A) Each device must be configured manually through its CLI.
-B) It provides centralized, policy-based (intent-based) management with automation and assurance.
-C) It removes the need for a data plane on network devices.
-D) It works only with devices from multiple vendors, not Cisco devices.
+A) Each device must be configured manually through its own CLI.
+B) Policies are defined once on the controller and pushed consistently to many devices through APIs.
+C) Devices no longer need a data plane.
+D) The control plane runs independently on every device with no central view.
 answer: B
 explanation:
-Gestione tradizionale: configurazione dispositivo per dispositivo (CLI), soggetta a errori e incoerenze. Catalyst Center: controller centralizzato con policy di intento, provisioning automatico, telemetria e "assurance" (analisi dello stato della rete, anche con AI/ML), API northbound REST. I dispositivi mantengono comunque il proprio data plane.
-reference: Exam topic 6.4 - Compare traditional campus device management with Cisco Catalyst Center enabled device management
+Nella gestione tradizionale ogni dispositivo ha control plane e management plane propri e si configura uno alla volta: lento e facile da rendere incoerente. Con un controller l'amministratore definisce l'intento una volta, il controller lo traduce in configurazioni e le distribuisce tramite API southbound (NETCONF, RESTCONF, OpenFlow...), offrendo una visione centralizzata della rete.
+Il data plane (inoltro dei pacchetti) resta sempre sui dispositivi.
+reference: Exam topic 6.2 - Compare traditional networks with controller-based networking
 [/Q]
 
 [Q]
@@ -210,7 +211,7 @@ D) It assigns IP addresses to clients instead of DHCP.
 answer: B
 explanation:
 L'AI predittiva/ML apprende i comportamenti "normali" dalla telemetria e rileva anomalie, prevede guasti e problemi di capacità e suggerisce rimedi (AIOps). L'AI generativa produce contenuti (es. configurazioni, riepiloghi, risposte in linguaggio naturale) che vanno sempre verificati prima dell'uso.
-reference: Exam topic 6.3 - Describe AI (generative and predictive) and machine learning in network operations
+reference: Exam topic 6.4 - Describe AI (generative and predictive) and machine learning in network operations
 [/Q]
 
 [Q]
@@ -227,7 +228,7 @@ D) The northbound API of the controller
 answer: B
 explanation:
 Underlay: rete fisica (switch, link) e il routing IP che li collega (es. IS-IS o OSPF). Overlay: rete logica costruita sopra con tunnel (VXLAN nel data plane, LISP nel control plane per SD-Access). Fabric: l'insieme di underlay + overlay gestito come un'unica entità.
-reference: Exam topic 6.2.a - Overlay, underlay, and fabric
+reference: Exam topic 6.3 - Describe controller-based, software defined architecture (overlay, underlay, and fabric)
 [/Q]
 
 [Q]
@@ -282,7 +283,7 @@ D) It uses JSON over UDP.
 answer: B
 explanation:
 NETCONF (RFC 6241): trasporto SSH su TCP 830, codifica XML, modelli dati YANG, operazioni come get, get-config, edit-config, commit (con datastore candidate e running). RESTCONF offre funzioni simili su HTTPS con JSON o XML.
-reference: Exam topic 6.2 / 6.5 - Southbound APIs and data encoding
+reference: Exam topic 6.3.b - Northbound and Southbound APIs
 [/Q]
 
 [Q]
@@ -307,16 +308,17 @@ id: AUT-017
 domain: 6
 type: SINGLE
 text:
-What is YANG?
+Look at this JSON fragment: {"hostname": "R1", "interfaces": ["Gi0/0", "Gi0/1"], "ospf": true}. What data type is the value of "interfaces"?
 options:
-A) A transport protocol for network management
-B) A data modeling language that defines the structure of configuration and operational data
-C) A configuration management tool similar to Ansible
-D) A JSON parser included in Cisco IOS
+A) Object
+B) Array
+C) String
+D) Boolean
 answer: B
 explanation:
-YANG descrive in modo formale quali dati di configurazione e di stato esistono (es. interfacce, VLAN), con tipi, vincoli e gerarchia. NETCONF e RESTCONF trasportano dati conformi a questi modelli, codificati in XML o JSON. Esistono modelli standard (IETF, OpenConfig) e modelli nativi dei vendor.
-reference: Exam topic 6.2 / 6.5 - Programmability concepts
+In JSON le parentesi quadre [ ] delimitano un array (lista ordinata di valori separati da virgole); le graffe { } delimitano un oggetto (coppie chiave: valore). "R1" è una stringa (sempre tra virgolette doppie), true è un booleano (senza virgolette), i numeri si scrivono senza virgolette.
+Errori frequenti: virgolette singole, virgola dopo l'ultimo elemento, chiavi senza virgolette: tutti rendono il JSON non valido.
+reference: Exam topic 6.7 - Interpret JSON encoded data
 [/Q]
 
 [Q]
@@ -446,7 +448,7 @@ D) Power plane
 answer: B
 explanation:
 Nell'SDN il control plane (le decisioni su come instradare/inoltrare) è centralizzato, del tutto o in parte, nel controller, che programma i dispositivi tramite le API southbound. Il data plane resta distribuito sui dispositivi, che inoltrano il traffico in hardware.
-reference: Exam topic 6.2 - Compare traditional networks with controller-based networking
+reference: Exam topic 6.3.a - Separation of control plane and data plane
 [/Q]
 
 [Q]
@@ -463,7 +465,7 @@ D) SMTP
 answer: A
 explanation:
 OpenFlow (ONF) permette al controller di programmare direttamente le tabelle di inoltro degli switch: è un'API southbound. Altri esempi: NETCONF, RESTCONF, OpFlex (Cisco ACI), SSH/CLI. Le API usate dalle applicazioni verso il controller sono northbound.
-reference: Exam topic 6.2 - Controller-based networking
+reference: Exam topic 6.3.b - Northbound and Southbound APIs
 [/Q]
 
 [Q]
@@ -471,16 +473,17 @@ id: AUT-026
 domain: 6
 type: SINGLE
 text:
-Which Cisco Catalyst Center function uses telemetry and analytics to show network health and help troubleshoot client and device issues?
+In a controller-based architecture, a custom script retrieves the list of devices from the controller by sending HTTPS requests to a REST API. Which interface is the script using?
 options:
-A) Design
-B) Policy
-C) Provision
-D) Assurance
-answer: D
+A) Southbound API
+B) Northbound API
+C) Eastbound API
+D) Data plane
+answer: B
 explanation:
-Aree principali di Catalyst Center: Design (gerarchia dei siti, impostazioni di rete, immagini software), Policy (gruppi, segmentazione, QoS), Provision (distribuzione delle configurazioni ai dispositivi), Assurance (health score, telemetria, analisi dei problemi con AI/ML e azioni consigliate).
-reference: Exam topic 6.4 - Cisco Catalyst Center enabled device management
+Le API northbound collegano il controller "verso l'alto": applicazioni, script e strumenti di orchestrazione (tipicamente REST con JSON su HTTPS). Le API southbound collegano il controller "verso il basso", ai dispositivi di rete (NETCONF, RESTCONF, OpenFlow, SSH/CLI).
+Eastbound/westbound indicano la comunicazione tra controller, non tra script e controller.
+reference: Exam topic 6.3.b - Northbound and Southbound APIs
 [/Q]
 
 [Q]
@@ -488,33 +491,36 @@ id: AUT-027
 domain: 6
 type: SINGLE
 text:
-What is intent-based networking (IBN)?
+Which statement describes traditional (non controller-based) network management?
 options:
-A) A method of configuring each device manually through the CLI
-B) An approach in which administrators define desired business outcomes, the system translates them into network policies and continuously verifies that the network behaves as intended
-C) A routing protocol that selects paths based on application intent
-D) A wireless security standard
+A) A central controller computes the forwarding tables for all switches.
+B) Each device runs its own control plane and is configured and monitored individually, usually through CLI or SNMP.
+C) Configuration changes are always validated automatically before deployment.
+D) Devices expose only northbound APIs.
 answer: B
 explanation:
-IBN = ciclo continuo: intento (cosa si vuole ottenere) → traduzione in policy → attivazione automatica sui dispositivi → assurance (verifica continua e correzione). Cisco Catalyst Center e SD-Access ne sono le implementazioni Cisco nel campus.
-reference: Exam topic 6.4 - Catalyst Center enabled device management
+Rete tradizionale = control plane distribuito: ogni router/switch calcola da solo le proprie tabelle (OSPF, STP...) e viene gestito singolarmente (CLI via SSH, SNMP, syslog). Funziona bene ma, al crescere della rete, le modifiche sono lente e gli errori umani più probabili.
+Con un controller la gestione diventa centralizzata e programmabile, con verifiche e automazione (risposte A e C).
+reference: Exam topic 6.2 - Compare traditional networks with controller-based networking
 [/Q]
 
 [Q]
 id: AUT-028
 domain: 6
-type: SINGLE
+type: MULTI
 text:
-Which configuration management tool organizes its configuration code into recipes and cookbooks?
+Which two statements correctly compare Ansible and Terraform? (Choose two.)
 options:
-A) Ansible
-B) Puppet
-C) Chef
-D) Terraform
-answer: C
+A) Ansible is agentless and uses playbooks written in YAML, usually pushed over SSH.
+B) Terraform requires an agent installed on every managed device.
+C) Terraform uses declarative configuration files (HCL) and keeps a state file to track the infrastructure it manages.
+D) Ansible playbooks are written in Ruby recipes and cookbooks.
+E) Neither tool can be used with network devices.
+answer: A, C
 explanation:
-Chef: recipe e cookbook in Ruby, agent-based, modello pull. Puppet: manifest e module, agent-based, pull. Ansible: playbook in YAML, agentless, push. Terraform: file HCL dichiarativi per il provisioning dell'infrastruttura.
-reference: Exam topic 6.6 - Configuration management mechanisms
+Ansible: agentless, playbook YAML, modello push (via SSH o API), molto usato per configurare dispositivi di rete. Terraform: infrastructure as code dichiarativo in HCL; descrivi lo stato finale desiderato, Terraform confronta con il file di stato e applica solo le differenze (plan/apply); nasce per il provisioning (cloud, VM, rete).
+Ricette e cookbook in Ruby (D) sono il linguaggio di Chef, non più nel blueprint.
+reference: Exam topic 6.6 - Recognize the capabilities of configuration management mechanisms such as Ansible and Terraform
 [/Q]
 
 [Q]
@@ -599,7 +605,7 @@ D) Disable logging so the AI changes cannot be audited.
 answer: B
 explanation:
 L'AI generativa può accelerare il lavoro (bozze di configurazione, script, documentazione, spiegazione dei log), ma può produrre risultati plausibili e sbagliati ("allucinazioni"). Le configurazioni vanno verificate, testate e approvate; inoltre non bisogna inviare dati sensibili (password, topologie) a servizi esterni non autorizzati.
-reference: Exam topic 6.3 - Describe AI (generative and predictive) and machine learning in network operations
+reference: Exam topic 6.4 - Describe AI (generative and predictive) and machine learning in network operations
 [/Q]
 
 [Q]

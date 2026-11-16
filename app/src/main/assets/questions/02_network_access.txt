@@ -122,7 +122,7 @@ answer: C
 explanation:
 BPDU Guard protegge le porte edge: se arriva una BPDU (qualcuno ha collegato uno switch), la porta va in err-disabled. Si ripristina con "shutdown"/"no shutdown" oppure automaticamente con "errdisable recovery cause bpduguard".
 Senza BPDU Guard, una porta PortFast che riceve BPDU perde semplicemente lo stato di edge port, ma continua a funzionare.
-reference: Exam topic 2.5.b - PortFast and its benefits / BPDU Guard
+reference: Exam topic 2.5.c - PortFast / 2.5.d - BPDU guard
 [/Q]
 
 [Q]
@@ -213,7 +213,7 @@ Bridge => Builds point-to-point or mesh links between APs
 targets: SE-Connect
 explanation:
 Modalità AP da ricordare: Local (default), FlexConnect (filiali, local switching), Monitor (rilevamento), Sniffer (cattura per Wireshark/OmniPeek), Rogue Detector, Bridge/Mesh, SE-Connect (spectrum analysis, analizza interferenze RF anche non Wi-Fi).
-reference: Exam topic 2.7 - Describe physical infrastructure connections of WLAN components / AP modes
+reference: Exam topic 2.6 - Describe Cisco Wireless Architectures and AP modes
 [/Q]
 
 [Q]
@@ -665,7 +665,7 @@ D) Point-to-point port
 answer: C
 explanation:
 In RSTP le porte verso gli host (PortFast) sono "edge port": passano subito in forwarding e non generano topology change quando cambiano stato. Le porte full-duplex tra switch sono di tipo "point-to-point" e convergono rapidamente con il meccanismo proposal/agreement.
-reference: Exam topic 2.5.b - PortFast
+reference: Exam topic 2.5.c - PortFast
 [/Q]
 
 [Q]
@@ -1028,4 +1028,60 @@ answer: B
 explanation:
 Lo switch comunica al telefono la voice VLAN tramite CDP (telefoni Cisco) o LLDP-MED (telefoni standard). Il telefono tagga quindi il traffico voce con VLAN 20, mentre il PC collegato dietro di esso invia traffico untagged nella access VLAN.
 reference: Exam topic 2.1.b - Access ports (data and voice) / 2.3 CDP and LLDP
+[/Q]
+
+[Q]
+id: NA-056
+domain: 2
+type: SINGLE
+text:
+Which STP protection feature prevents an alternate or root port from moving to the forwarding state when it stops receiving BPDUs, for example because of a unidirectional link?
+options:
+A) BPDU Guard
+B) Root Guard
+C) Loop Guard
+D) PortFast
+answer: C
+explanation:
+Loop Guard: se una porta non designata (root o alternate) smette di ricevere BPDU, invece di diventare designata e inoltrare (creando un loop) passa nello stato "loop-inconsistent" e resta bloccata finché le BPDU non tornano.
+BPDU Guard disattiva (err-disabled) una porta PortFast che riceve BPDU; Root Guard blocca una porta che riceve BPDU superiori (impedisce che un altro switch diventi root da quel lato).
+Comando: "spanning-tree guard loop" sull'interfaccia, oppure "spanning-tree loopguard default" globale.
+reference: Exam topic 2.5.d - Root guard, loop guard, BPDU filter, and BPDU guard
+[/Q]
+
+[Q]
+id: NA-057
+domain: 2
+type: SINGLE
+text:
+What is the effect of "spanning-tree bpdufilter enable" configured directly on an access interface?
+options:
+A) The port is err-disabled when it receives a BPDU.
+B) The port stops sending and ignores received BPDUs, effectively disabling STP on that port.
+C) The port becomes the root port.
+D) The port is blocked if it receives a superior BPDU.
+answer: B
+explanation:
+BPDU Filter configurato sull'interfaccia fa sì che la porta non invii e ignori le BPDU: STP di fatto è spento su quella porta, e collegando per errore uno switch si rischia un loop. Va usato con molta cautela.
+Configurato in modo globale ("spanning-tree portfast bpdufilter default") si comporta diversamente: vale solo per le porte PortFast e, se arriva una BPDU, la porta perde lo stato PortFast e torna a STP normale.
+A descrive BPDU Guard, D descrive Root Guard.
+reference: Exam topic 2.5.d - Root guard, loop guard, BPDU filter, and BPDU guard
+[/Q]
+
+[Q]
+id: NA-058
+domain: 2
+type: SINGLE
+text:
+A company manages its access points through a web dashboard hosted by the vendor on the internet, with no on-premises WLC. Which management model is this?
+options:
+A) Autonomous APs managed with console cables
+B) Cloud-managed APs (for example Cisco Meraki)
+C) Lightweight APs in FlexConnect mode on a local WLC
+D) APs in monitor mode
+answer: B
+explanation:
+Negli AP cloud-managed (es. Cisco Meraki) la configurazione e il monitoraggio avvengono da una dashboard nel cloud: gli AP si collegano via internet al servizio del vendor, non serve un controller in sede. Il traffico degli utenti resta comunque locale: nel cloud passa solo il traffico di gestione.
+Gli altri accessi di gestione da conoscere per AP e WLC: console, Telnet, SSH, HTTP/HTTPS e autenticazione tramite TACACS+/RADIUS.
+reference: Exam topic 2.8 - Describe network device management access (Telnet, SSH, HTTP, HTTPS, console, TACACS+/RADIUS, and cloud managed)
 [/Q]

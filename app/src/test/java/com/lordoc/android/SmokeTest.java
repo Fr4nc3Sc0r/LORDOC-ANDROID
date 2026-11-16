@@ -134,6 +134,28 @@ public class SmokeTest {
         c.pause().stop().destroy();
     }
 
+    @Test
+    public void indietroDuranteLEsameChiedeConferma() {
+        ExamSession s = app().getFactory().fromPreset(app().getFactory().presetExams().get(0), ExamMode.STUDY, true);
+        app().startSession(s);
+        ExamActivity exam = Robolectric.buildActivity(ExamActivity.class).setup().get();
+        exam.onHeaderBack();
+        AlertDialog dialog = (AlertDialog) ShadowDialog.getLatestDialog();
+        assertNotNull(dialog);
+        assertTrue(dialog.isShowing());
+        assertTrue("l'esame non deve chiudersi senza conferma", !exam.isFinishing());
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+        ShadowLooper.idleMainLooper();
+        assertTrue(exam.isFinishing());
+    }
+
+    @Test
+    public void inDebugSoloAnnunciDiProvaENienteAnnunciNeiTest() {
+        assertTrue(BuildConfig.ADMOB_BANNER_ID.startsWith("ca-app-pub-3940256099942544/"));
+        assertTrue(BuildConfig.ADMOB_INTERSTITIAL_ID.startsWith("ca-app-pub-3940256099942544/"));
+        assertTrue(Ads.disabled());
+    }
+
     // ------------------------------------------------------------------ utilità
 
     private static void answerCorrectly(Question q, Response r) {

@@ -1,6 +1,5 @@
 package com.lordoc.android;
 
-import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
@@ -12,7 +11,7 @@ import android.widget.TextView;
 import com.lordoc.util.IpUtils;
 
 /** Calcolatore IPv4: rete, broadcast, range host, maschera, wildcard, magic number, binario. */
-public final class SubnetCalculatorActivity extends Activity {
+public final class SubnetCalculatorActivity extends BaseActivity {
 
     private EditText input;
     private TextView error;
